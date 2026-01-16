@@ -56,8 +56,13 @@ export const DataProvider = ({ children }) => {
 
   const updateRepairStatus = (id, newStatus) => {
     setRepairs(
-      repairs.map((r) => (r.id === id ? { ...r, status: newStatus } : r))
+      repairs.map((r) => (r.id === id ? { ...r, status: newStatus } : r)),
     );
+  };
+
+  const deleteRepair = (id) => {
+    setRepairs(repairs.filter((r) => r.id !== id));
+    return { success: true };
   };
 
   // User Management
@@ -204,6 +209,7 @@ export const DataProvider = ({ children }) => {
         repairs,
         addRepair,
         updateRepairStatus,
+        deleteRepair,
         contacts,
         fetchContacts,
         submitContact,

@@ -1,12 +1,12 @@
-import { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
-import { useAuth } from '../../context/AuthContext';
-import { Wrench, Mail, Lock, Eye, EyeOff } from 'lucide-react';
+import { useState } from "react";
+import { useNavigate, Link } from "react-router-dom";
+import { useAuth } from "../../context/AuthContextHooks";
+import { Wrench, Mail, Lock, Eye, EyeOff } from "lucide-react";
 
 const Signin = () => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const { login } = useAuth();
   const navigate = useNavigate();
@@ -15,7 +15,7 @@ const Signin = () => {
     e.preventDefault();
     const result = await login(email, password);
     if (result.success) {
-      navigate('/dashboard');
+      navigate("/dashboard");
     } else {
       setError(result.message);
     }
@@ -42,7 +42,9 @@ const Signin = () => {
           )}
           <div className="rounded-md shadow-sm space-y-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Email address</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Email address
+              </label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                   <Mail className="h-5 w-5 text-gray-400" />
@@ -58,7 +60,9 @@ const Signin = () => {
               </div>
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Password</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Password
+              </label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                   <Lock className="h-5 w-5 text-gray-400" />
@@ -94,7 +98,10 @@ const Signin = () => {
               Sign in
             </button>
             <div className="text-center mt-6">
-              <Link to="/signup" className="text-sm font-bold text-navy-300 hover:text-navy-900 transition-colors">
+              <Link
+                to="/signup"
+                className="text-sm font-bold text-navy-300 hover:text-navy-900 transition-colors"
+              >
                 Don't have an account? Sign up
               </Link>
             </div>
