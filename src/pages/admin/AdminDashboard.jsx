@@ -1,43 +1,60 @@
 import { useState, useEffect } from 'react';
 import { useData } from '../../context/DataContext';
-import { Users, Activity, Newspaper, MessageSquare, Mail } from 'lucide-react';
+import { useAuth } from '../../context/AuthContext';
+import {
+  Users,
+  FileText,
+  MessageSquare,
+  LayoutDashboard,
+  LogOut,
+  Bell,
+  Search,
+  Settings,
+  Menu,
+  X,
+  Inbox as InboxIcon,
+  Type // Icon for Content Manager
+} from 'lucide-react';
 import Overview from './Overview';
 import UserManagement from './UserManagement';
 import BlogManager from './BlogManager';
 import ReviewModeration from './ReviewModeration';
+import ContentManager from './ContentManager';
 import Inbox from './Inbox';
 
 const AdminDashboard = () => {
   const { fetchUsers, fetchContacts } = useData();
-  const [activeTab, setActiveTab] = useState('Overview');
+  const [activeTab, setActiveTab] = useState('overview');
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const { logout, user } = useAuth();
 
   useEffect(() => {
     fetchUsers();
-    if (activeTab === 'Messages') {
-      fetchContacts();
-    }
-  }, [activeTab, fetchUsers, fetchContacts]);
+    fetchContacts();
+  }, [fetchUsers, fetchContacts]);
 
   const menuItems = [
-    { id: 'Overview', icon: <Activity className="w-5 h-5" />, label: 'Overview' },
-    { id: 'Users', icon: <Users className="w-5 h-5" />, label: 'Manage Users' },
-    { id: 'Blogs', icon: <Newspaper className="w-5 h-5" />, label: 'Manage Blogs' },
-    { id: 'Reviews', icon: <MessageSquare className="w-5 h-5" />, label: 'Manage Reviews' },
-    { id: 'Messages', icon: <Mail className="w-5 h-5" />, label: 'Messages' },
+    { id: 'overview', label: 'Overview', icon: <LayoutDashboard className="w-5 h-5" /> },
+    { id: 'users', label: 'Users', icon: <Users className="w-5 h-5" /> },
+    { id: 'blogs', label: 'Blogs', icon: <FileText className="w-5 h-5" /> },
+    { id: 'reviews', label: 'Reviews', icon: <MessageSquare className="w-5 h-5" /> },
+    { id: 'inbox', label: 'Inbox', icon: <InboxIcon className="w-5 h-5" /> },
+    { id: 'content', label: 'Content', icon: <Type className="w-5 h-5" /> }, // New Menu Item
   ];
 
   const renderContent = () => {
     switch (activeTab) {
-      case 'Overview':
-        return <Overview />;
-      case 'Users':
+      case 'users':
         return <UserManagement />;
-      case 'Blogs':
+      case 'blogs':
         return <BlogManager />;
-      case 'Reviews':
+      case 'reviews':
         return <ReviewModeration />;
-      case 'Messages':
+      case 'inbox':
         return <Inbox />;
+      case 'content':
+        return <ContentManager />; // New Case
+      case 'overview':
       default:
         return <Overview />;
     }

@@ -1,7 +1,22 @@
 import { Link } from "react-router-dom";
 import { Wrench } from "lucide-react";
+import { useEffect, useState } from "react";
+import { useData } from "../context/DataContext";
 
 const Footer = () => {
+  const { fetchContent } = useData();
+  const [siteName, setSiteName] = useState('Fixonic');
+
+  useEffect(() => {
+    const loadSiteName = async () => {
+        const data = await fetchContent('settings');
+        if (data && data['settings-site-name']) {
+            setSiteName(data['settings-site-name']);
+        }
+    };
+    loadSiteName();
+  }, [fetchContent]);
+
   return (
     <footer className="bg-navy-900 border-t border-white/5 py-5">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row justify-between items-center gap-12">
@@ -10,7 +25,7 @@ const Footer = () => {
             <Wrench className="w-6 h-6 text-navy-900" />
           </div>
           <span className="text-2xl font-black tracking-tight text-white">
-            Fixonic
+            {siteName}
           </span>
         </div>
         <div className="flex gap-10 text-white font-bold uppercase tracking-widest text-[10px]">
@@ -37,7 +52,7 @@ const Footer = () => {
           </Link>
         </div>
         <p className="text-white text-xs font-black uppercase tracking-widest">
-          © 2026 Fixonic Inc.
+          © 2026 {siteName} Inc.
         </p>
       </div>
     </footer>

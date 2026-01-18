@@ -1,18 +1,36 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Target, Users, Award, ShieldCheck, MapPin, Phone, Mail } from 'lucide-react';
+import { useData } from '../context/DataContext';
 
 const About = () => {
+  const { fetchContent } = useData();
+  const [content, setContent] = useState({
+      'about-hero-title': 'Fixing Technology,', 
+      'about-hero-subtitle': 'Fixonic is the leading marketplace for high-quality device repair services.  We connect thousands of customers with certified technicians every single day.',
+      'about-mission-title': 'Our Mission',
+      'about-mission-text': 'To provide fast, reliable, and transparent repair services for every home and office. We believe that technology should be a solution, not a source of stress, which is why we bring the best technicians directly to your doorstep.'
+  });
+
+  useEffect(() => {
+    const loadContent = async () => {
+        const data = await fetchContent('about');
+        if (data && Object.keys(data).length > 0) {
+            setContent(prev => ({ ...prev, ...data }));
+        }
+    };
+    loadContent();
+  }, [fetchContent]);
+
   return (
     <div className="pt-24 min-h-screen bg-white">
       {/* Hero Section */}
       <section className="bg-primary-50 pt-20 pb-10 px-4">
         <div className="max-w-7xl mx-auto text-center pb-5">
           <h1 className="text-4xl md:text-5xl font-black text-gray-900 mb-6 tracking-tight">
-            Fixing Technology, <span className="bg-clip-text text-transparent bg-gradient-to-r from-lime-500 to-lime-600">Empowering People.</span>
+            {content['about-hero-title']} <span className="bg-clip-text text-transparent bg-gradient-to-r from-lime-500 to-lime-600">Empowering People.</span>
           </h1>
           <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
-            Fixonic is the leading marketplace for high-quality device repair services. 
-            We connect thousands of customers with certified technicians every single day.
+            {content['about-hero-subtitle']}
           </p>
         </div>
       </section>
@@ -44,20 +62,16 @@ const About = () => {
         <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-12">
           <div className="bg-white p-10 rounded-3xl shadow-sm border border-gray-100">
             <Target className="w-12 h-12 text-primary-600 mb-6" />
-            <h2 className="text-2xl font-black text-gray-900 mb-4">Our Mission</h2>
+            <h2 className="text-2xl font-black text-gray-900 mb-4">{content['about-mission-title']}</h2>
             <p className="text-gray-600 leading-relaxed">
-              To provide fast, reliable, and transparent repair services for every home and office. 
-              We believe that technology should be a solution, not a source of stress, which is 
-              why we bring the best technicians directly to your doorstep.
+              {content['about-mission-text']}
             </p>
           </div>
           <div className="bg-white p-10 rounded-3xl shadow-sm border border-gray-100">
             <Users className="w-12 h-12 text-secondary-600 mb-6" />
-            <h2 className="text-2xl font-black text-gray-900 mb-4">Our Community</h2>
+            <h2 className="text-2xl font-black text-gray-900 mb-4">{content['about-community-title']}</h2>
             <p className="text-gray-600 leading-relaxed">
-              We are more than just a repair shop; we are a platform that empowers local skilled 
-              technicians to grow their businesses while providing customers with a seamless, 
-              trustworthy experience they can depend on.
+              {content['about-community-text']}
             </p>
           </div>
         </div>
@@ -67,8 +81,8 @@ const About = () => {
        <section className="py-24 px-4">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
-            <h2 className="text-3xl font-black text-gray-900">What Drives Us</h2>
-            <p className="text-gray-500 mt-2">Core values that define Fixonic</p>
+            <h2 className="text-3xl font-black text-gray-900">{content['about-values-title']}</h2>
+            <p className="text-gray-500 mt-2">{content['about-values-subtitle']}</p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             <div className="text-center">

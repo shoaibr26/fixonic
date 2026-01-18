@@ -326,6 +326,44 @@ export const DataProvider = ({ children }) => {
   };
 
   // Repair Management
+  // Content Management
+  const fetchContent = useCallback(async (pageName) => {
+    try {
+      const response = await fetch(`${API_URL}/content/${pageName}`);
+      const data = await response.json();
+      if (response.ok) {
+        return data.sections || {};
+      }
+      return {};
+    } catch (error) {
+      console.error("Error fetching content:", error);
+      return {};
+    }
+  }, []);
+
+  const updateContent = async (pageName, sections) => {
+    try {
+      const token = getToken();
+      const response = await fetch(`${API_URL}/content/${pageName}`, {
+        method: "PUT",
+        headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ sections }),
+      });
+      const data = await response.json();
+      if (response.ok) {
+         return { success: true, data };
+      } else {
+         return { success: false, message: data.message };
+      }
+    } catch (error) {
+       console.error("Error updating content:", error);
+       return { success: false, message: error.message };
+    }
+  };
+
   const [repairs, setRepairs] = useState(DUMMY_REPAIRS);
   
   const addRepair = (repair) => {
@@ -370,6 +408,8 @@ export const DataProvider = ({ children }) => {
         fetchContacts,
         submitContact,
         deleteContactMessage,
+        fetchContent,
+        updateContent2: updateContent,
       }}
     >
       {children}

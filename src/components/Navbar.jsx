@@ -1,6 +1,7 @@
-import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "../context/AuthContextHooks";
+import { useData } from "../context/DataContext";
 import {
   Wrench,
   LogOut,
@@ -11,79 +12,107 @@ import {
   X as CloseIcon,
 } from "lucide-react";
 
-const NavLinks = ({ setIsMobileMenuOpen, user }) => (
-  <>
-    <Link
-      to="/"
-      onClick={() => setIsMobileMenuOpen(false)}
-      className="text-sm font-bold text-white/70 hover:text-white transition-colors"
-    >
-      Home
-    </Link>
-    <Link
-      to="/about"
-      onClick={() => setIsMobileMenuOpen(false)}
-      className="text-sm font-bold text-white/70 hover:text-white transition-colors"
-    >
-      About
-    </Link>
-    <Link
-      to="/services"
-      onClick={() => setIsMobileMenuOpen(false)}
-      className="text-sm font-bold text-white/70 hover:text-white transition-colors"
-    >
-      Services
-    </Link>
-    <Link
-      to="/journals"
-      onClick={() => setIsMobileMenuOpen(false)}
-      className="text-sm font-bold text-white/70 hover:text-white transition-colors"
-    >
-      Journals
-    </Link>
-    <Link
-      to="/contact"
-      onClick={() => setIsMobileMenuOpen(false)}
-      className="text-sm font-bold text-white/70 hover:text-white transition-colors"
-    >
-      Contact
-    </Link>
-    {user?.role === "client" && (
+const NavLinks = ({ setIsMobileMenuOpen, user }) => {
+  const location = useLocation();
+
+  const getLinkClasses = (path) => {
+    const isActive = location.pathname === path;
+    return `text-sm font-bold transition-colors border-b-2 ${
+      isActive
+        ? "text-white border-lime-500"
+        : "text-white/70 hover:text-white border-transparent"
+    }`;
+  };
+
+  return (
+    <>
       <Link
-        to="/dashboard"
+        to="/"
         onClick={() => setIsMobileMenuOpen(false)}
-        className="text-sm font-bold text-lime-500 hover:text-lime-400 transition-colors flex items-center gap-2"
+        className={getLinkClasses("/")}
       >
-        <Wrench className="w-4 h-4" /> Book Repair
+        Home
       </Link>
-    )}
-    {user?.role === "vendor" && (
       <Link
-        to="/dashboard"
+        to="/about"
         onClick={() => setIsMobileMenuOpen(false)}
-        className="text-sm font-bold text-white/70 hover:text-white flex items-center gap-2"
+        className={getLinkClasses("/about")}
       >
-        <LayoutDashboard className="w-4 h-4 text-lime-500" /> Dashboard
+        About
       </Link>
-    )}
-    {user?.role === "admin" && (
       <Link
-        to="/dashboard"
+        to="/services"
         onClick={() => setIsMobileMenuOpen(false)}
-        className="text-sm font-bold text-white/70 hover:text-white flex items-center gap-2"
+        className={getLinkClasses("/services")}
       >
-        <BarChart className="w-4 h-4 text-lime-500" /> Admin
+        Services
       </Link>
-    )}
-  </>
-);
+      <Link
+        to="/journals"
+        onClick={() => setIsMobileMenuOpen(false)}
+        className={getLinkClasses("/journals")}
+      >
+        Journals
+      </Link>
+      <Link
+        to="/contact"
+        onClick={() => setIsMobileMenuOpen(false)}
+        className={getLinkClasses("/contact")}
+      >
+        Contact
+      </Link>
+      {user?.role === "client" && (
+        <Link
+          to="/dashboard"
+          onClick={() => setIsMobileMenuOpen(false)}
+          className={getLinkClasses("/dashboard").replace(
+            "text-white/70",
+            "text-lime-500"
+          ) + " flex items-center gap-2"}
+        >
+          <Wrench className="w-4 h-4" /> Book Repair
+        </Link>
+      )}
+      {user?.role === "vendor" && (
+        <Link
+          to="/dashboard"
+          onClick={() => setIsMobileMenuOpen(false)}
+          className={getLinkClasses("/dashboard") + " flex items-center gap-2"}
+        >
+          <LayoutDashboard className="w-4 h-4 text-lime-500" /> Dashboard
+        </Link>
+      )}
+      {user?.role === "admin" && (
+        <Link
+          to="/dashboard"
+          onClick={() => setIsMobileMenuOpen(false)}
+          className={getLinkClasses("/dashboard") + " flex items-center gap-2"}
+        >
+          <BarChart className="w-4 h-4 text-lime-500" /> Admin
+        </Link>
+      )}
+    </>
+  );
+};
 
 const Navbar = () => {
   const navigate = useNavigate();
   const { user, logout } = useAuth();
+  const { fetchContent } = useData();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
   const [notificationTab, setNotificationTab] = useState("All");
+  const [siteName, setSiteName] = useState('Fixonic');
+
+  useEffect(() => {
+    const loadSiteName = async () => {
+        const data = await fetchContent('settings');
+        if (data && data['settings-site-name']) {
+            setSiteName(data['settings-site-name']);
+        }
+    };
+    loadSiteName();
+  }, [fetchContent]);
 
   const handleLogout = () => {
     logout();
@@ -105,7 +134,7 @@ const Navbar = () => {
                 <Wrench className="w-6 h-6 text-navy-900" />
               </div>
               <span className="text-2xl font-black tracking-tight text-white">
-                Fixonic
+                {siteName}
               </span>
             </Link>
           </div>

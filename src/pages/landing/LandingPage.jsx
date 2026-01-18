@@ -5,12 +5,28 @@ import { useData } from '../../context/DataContext';
 import { Smartphone, Laptop, ShieldCheck, Clock, Star, ArrowRight, ChevronLeft, ChevronRight } from 'lucide-react';
 
 const LandingPage = () => {
-  const { blogs, reviews, fetchBlogs, loadingBlogs, fetchReviews, loadingReviews } = useData();
-  
+  const { blogs, reviews, fetchBlogs, loadingBlogs, fetchReviews, loadingReviews, fetchContent } = useData();
+  const [content, setContent] = useState({
+      'landing-hero-title': 'Fix Your Tech \nAt Speed of Life.',
+      'landing-hero-subtitle': 'Connect with top-rated technicians for instant repairs. From cracked screens to complex diagnostics, we\'ve got you covered.',
+      'landing-services-title': 'We Fix Everything',
+      'landing-services-tag': 'Services',
+      'landing-reviews-title': 'Loved by Thousands',
+      'landing-reviews-tag': 'Testimonials',
+      'landing-reviews-subtitle': 'Loved by Thousands'
+  });
+
   useEffect(() => {
     fetchBlogs();
     fetchReviews();
-  }, [fetchBlogs, fetchReviews]);
+    const loadContent = async () => {
+         const data = await fetchContent('landing');
+         if (data && Object.keys(data).length > 0) {
+             setContent(prev => ({ ...prev, ...data }));
+         }
+    };
+    loadContent();
+  }, [fetchBlogs, fetchReviews, fetchContent]);
 
   const [currentReviewIndex, setCurrentReviewIndex] = useState(0);
 
@@ -65,12 +81,11 @@ const LandingPage = () => {
                 </span>
                 <span className="text-lime-400 text-xs font-black uppercase tracking-widest">Available in your area</span>
               </div>
-              <h1 className="text-5xl sm:text-6xl lg:text-7xl font-black text-white leading-[1.1] mb-8 tracking-tight">
-                Fix Your Tech <br />
-                <span className="text-transparent bg-clip-text bg-gradient-to-r from-lime-400 to-emerald-400">At Speed of Life.</span>
+              <h1 className="text-5xl sm:text-6xl lg:text-7xl font-black text-white leading-[1.1] mb-8 tracking-tight whitespace-pre-line">
+                {content['landing-hero-title']}
               </h1>
               <p className="text-xl text-gray-400 mb-10 max-w-2xl mx-auto lg:mx-0 font-medium leading-relaxed">
-                Connect with top-rated technicians for instant repairs. From cracked screens to complex diagnostics, we've got you covered.
+                {content['landing-hero-subtitle']}
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
                 <Link to="/signup" className="group relative px-8 py-4 bg-lime-500 text-navy-900 font-black rounded-2xl hover:bg-lime-400 transition-all shadow-[0_0_40px_-10px_rgba(132,204,22,0.5)] flex items-center justify-center gap-2 uppercase tracking-widest text-sm overflow-hidden">
@@ -135,8 +150,8 @@ const LandingPage = () => {
       <section className="py-32 bg-gray-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-20">
-            <span className="text-lime-600 font-extrabold tracking-widest uppercase text-sm">Services</span>
-            <h2 className="mt-2 text-4xl md:text-5xl font-black text-navy-900">We Fix Everything</h2>
+            <span className="text-lime-600 font-extrabold tracking-widest uppercase text-sm">{content['landing-services-tag']}</span>
+            <h2 className="mt-2 text-4xl md:text-5xl font-black text-navy-900">{content['landing-services-title']}</h2>
             <p className="mt-4 text-xl text-gray-500 max-w-2xl mx-auto">From vintage consoles to the latest flagships, our experts handle it all.</p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
@@ -224,8 +239,8 @@ const LandingPage = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 text-center">
           <div className="flex justify-between items-end mb-12 px-2">
             <div className="text-left">
-              <span className="text-lime-400 font-extrabold tracking-widest uppercase text-sm">Testimonials</span>
-              <h2 className="mt-2 text-4xl md:text-5xl font-black text-white">Loved by Thousands</h2>
+              <span className="text-lime-400 font-extrabold tracking-widest uppercase text-sm">{content['landing-reviews-tag']}</span>
+              <h2 className="mt-2 text-4xl md:text-5xl font-black text-white">{content['landing-reviews-title']}</h2>
             </div>
             {reviews.length > 3 && (
               <div className="flex gap-2">

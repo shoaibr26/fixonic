@@ -1,32 +1,36 @@
 import { useNavigate } from 'react-router-dom';
 import { useData } from '../context/DataContext';
 import { ArrowRight, ArrowLeft } from 'lucide-react';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 
 const Journals = () => {
   const navigate = useNavigate();
-  const { blogs, fetchBlogs, loadingBlogs } = useData();
+  const { blogs, fetchBlogs, loadingBlogs, fetchContent } = useData();
+  const [content, setContent] = useState({
+      'journals-hero-title': 'Tech Insights & Repair Guides',
+      'journals-hero-subtitle': 'Stay updated with the latest tips, tricks, and news from the world of technology repair.'
+  });
 
   useEffect(() => {
     fetchBlogs();
-  }, [fetchBlogs]);
+    const loadContent = async () => {
+         const data = await fetchContent('journals');
+         if (data && Object.keys(data).length > 0) {
+             setContent(prev => ({ ...prev, ...data }));
+         }
+    };
+    loadContent();
+  }, [fetchBlogs, fetchContent]);
 
   return (
-    <div className="bg-white font-sans selection:bg-lime-500 selection:text-white min-h-screen">
-       <div className="pt-32 pb-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
-          {/* Header */}
-          <div className="text-center mb-20">
-            <button 
-              onClick={() => navigate(-1)} 
-              className="inline-flex items-center gap-2 text-gray-400 hover:text-navy-900 transition-colors mb-8 font-bold text-sm"
-            >
-              <ArrowLeft className="w-4 h-4" /> Back to Home
-            </button>
+    <div className="pt-24 bg-white min-h-screen">
+      <div className="pt-20 pb-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+          <div className="mb-10 mt-10 text-center">
             <h1 className="text-4xl md:text-5xl font-black text-navy-900 mb-6 tracking-tight">
-              Tech Insights & <span className="bg-clip-text text-transparent bg-gradient-to-r from-lime-500 to-lime-600">Repair Guides</span>
+              {content['journals-hero-title']}
             </h1>
             <p className="text-xl text-gray-500 max-w-2xl mx-auto">
-              Stay updated with the latest tips, tricks, and news from the world of technology repair.
+              {content['journals-hero-subtitle']}
             </p>
           </div>
 

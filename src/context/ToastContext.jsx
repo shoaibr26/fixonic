@@ -26,7 +26,7 @@ export const ToastProvider = ({ children }) => {
   return (
     <ToastContext.Provider value={{ showToast }}>
       {children}
-      <div className="fixed top-24 right-6 z-[9999] space-y-4 pointer-events-none">
+      <div className="fixed top-16 left-1/2 -translate-x-1/2 z-[9999] space-y-4 pointer-events-none">
          <div className="flex flex-col gap-2 pointer-events-auto">
             {toasts.map((toast) => (
             <Toast

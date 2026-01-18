@@ -7,6 +7,7 @@ import {
   User,
   ChevronDown,
   Minimize2,
+  Maximize2,
   Paperclip,
 } from "lucide-react";
 
@@ -16,6 +17,7 @@ const ENDPOINT = import.meta.env.VITE_API_BASE_URL.replace("/api", "");
 
 const ChatWidget = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const [isExpanded, setIsExpanded] = useState(false);
   const [message, setMessage] = useState("");
   const [messages, setMessages] = useState([
     {
@@ -89,7 +91,9 @@ const ChatWidget = () => {
       <div
         className={`
           transition-all duration-300 ease-[cubic-bezier(0.19,1,0.22,1)] origin-bottom-right
-          mb-4 w-[380px] sm:w-[400px] max-w-[calc(100vw-2rem)]
+          mb-4 ${
+            isExpanded ? "w-[90vw] sm:w-[500px]" : "w-[380px] sm:w-[400px]"
+          } max-w-[calc(100vw-2rem)]
           bg-white/80 backdrop-blur-xl border border-white/20 shadow-2xl rounded-3xl overflow-hidden
           ${
             isOpen
@@ -125,10 +129,14 @@ const ChatWidget = () => {
           </div>
           <div className="flex items-center gap-1 text-navy-200 relative z-10">
             <button
-              onClick={() => setIsOpen(false)}
+              onClick={() => setIsExpanded(!isExpanded)}
               className="p-2 hover:bg-white/10 rounded-full transition-colors"
             >
-              <Minimize2 className="w-4 h-4" />
+              {isExpanded ? (
+                <Minimize2 className="w-4 h-4" />
+              ) : (
+                <Maximize2 className="w-4 h-4" />
+              )}
             </button>
             <button
               onClick={() => setIsOpen(false)}
@@ -140,7 +148,9 @@ const ChatWidget = () => {
         </div>
 
         {/* Messages Area */}
-        <div className="h-[400px] overflow-y-auto p-4 space-y-4 bg-gradient-to-b from-gray-50 to-white/50 scrollbar-thin scrollbar-thumb-gray-200 scrollbar-track-transparent">
+        <div className={`${
+          isExpanded ? "h-[500px]" : "h-[400px]"
+        } overflow-y-auto p-4 space-y-4 bg-gradient-to-b from-gray-50 to-white/50 scrollbar-thin scrollbar-thumb-gray-200 scrollbar-track-transparent transition-all duration-300`}>
           <div className="text-center text-xs text-gray-400 my-4 flex items-center justify-center gap-2 before:h-px before:w-12 before:bg-gray-200 after:h-px after:w-12 after:bg-gray-200">
             Today
           </div>

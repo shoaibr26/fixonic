@@ -1,8 +1,26 @@
 import { Smartphone, Laptop, Tablet, Watch, Speaker, Monitor, ArrowRight, Check } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { useEffect, useState } from 'react';
 import { SERVICE_CATEGORIES } from '../data/mockData';
+import { useData } from '../context/DataContext';
 
 const Services = () => {
+  const { fetchContent } = useData();
+  const [content, setContent] = useState({
+      'services-hero-title': 'Our Professional',
+      'services-hero-subtitle': 'Choose from a wide range of specialized repair categories. Our experts handle everything with precision.',
+  });
+
+  useEffect(() => {
+    const loadContent = async () => {
+        const data = await fetchContent('services');
+        if (data && Object.keys(data).length > 0) {
+            setContent(prev => ({ ...prev, ...data }));
+        }
+    };
+    loadContent();
+  }, [fetchContent]);
+
   const icons = {
       smartphone: <Smartphone className="w-12 h-12" />,
       laptop: <Laptop className="w-12 h-12" />,
@@ -18,11 +36,10 @@ const Services = () => {
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-20">
             <h1 className="text-4xl md:text-5xl font-black text-gray-900 mb-6 tracking-tight">
-              Our Professional <span className="bg-clip-text text-transparent bg-gradient-to-r from-lime-500 to-lime-600">Services</span>
+              {content['services-hero-title']} <span className="bg-clip-text text-transparent bg-gradient-to-r from-lime-500 to-lime-600">Services</span>
             </h1>
             <p className="text-xl text-gray-500 max-w-2xl mx-auto">
-              Choose from a wide range of specialized repair categories. 
-              Our experts handle everything with precision.
+              {content['services-hero-subtitle']}
             </p>
           </div>
 
