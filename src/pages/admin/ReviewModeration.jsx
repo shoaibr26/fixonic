@@ -47,6 +47,11 @@ const ReviewModeration = () => {
                 </td>
               </tr>
             ))}
+            {reviews.length === 0 && (
+              <tr>
+                <td colSpan="4" className="px-8 py-20 text-center text-gray-400">No reviews found.</td>
+              </tr>
+            )}
           </tbody>
         </table>
       </div>

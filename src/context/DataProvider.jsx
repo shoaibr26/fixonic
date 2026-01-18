@@ -14,33 +14,96 @@ const getToken = () => {
 };
 
 export const DataProvider = ({ children }) => {
-  const [blogs, setBlogs] = useState(INITIAL_BLOGS);
-  const [reviews, setReviews] = useState(INITIAL_REVIEWS);
-  const [repairs, setRepairs] = useState(DUMMY_REPAIRS);
-
   // Blog CRUD
-  const addBlog = (blog) => {
-    const newBlog = {
-      ...blog,
-      id: Date.now(),
-      date: new Date().toLocaleDateString("en-US", {
-        month: "long",
-        day: "numeric",
-        year: "numeric",
-      }),
-    };
-    setBlogs([newBlog, ...blogs]);
-    return { success: true };
+  const [blogs, setBlogs] = useState([]);
+  const [loadingBlogs, setLoadingBlogs] = useState(true);
+
+  const fetchBlogs = useCallback(async () => {
+    setLoadingBlogs(true);
+    try {
+      const response = await fetch(`${API_URL}/blogs`);
+      const data = await response.json();
+      if (response.ok) {
+        setBlogs(data);
+      }
+    } catch (error) {
+      console.error("Error fetching blogs:", error);
+    } finally {
+      setLoadingBlogs(false);
+    }
+  }, []);
+
+  const addBlog = async (blogData) => {
+    try {
+      const token = getToken();
+      const response = await fetch(`${API_URL}/blogs`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(blogData),
+      });
+
+      const data = await response.json();
+      if (response.ok) {
+        setBlogs([data, ...blogs]);
+        return { success: true };
+      } else {
+        return { success: false, message: data.message };
+      }
+    } catch (error) {
+      console.error("Error adding blog:", error);
+      return { success: false, message: error.message };
+    }
   };
 
-  const updateBlogData = (updatedBlog) => {
-    setBlogs(blogs.map((b) => (b.id === updatedBlog.id ? updatedBlog : b)));
-    return { success: true };
+  const updateBlogData = async (updatedBlog) => {
+    try {
+      const token = getToken();
+      const response = await fetch(`${API_URL}/blogs/${updatedBlog._id || updatedBlog.id}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(updatedBlog),
+      });
+
+      const data = await response.json();
+      if (response.ok) {
+        setBlogs(blogs.map((b) => ((b._id || b.id) === (data._id || data.id) ? data : b)));
+        return { success: true };
+      } else {
+         return { success: false, message: data.message };
+      }
+    } catch (error) {
+      console.error("Error updating blog:", error);
+      return { success: false, message: error.message };
+    }
   };
 
-  const deleteBlog = (id) => {
-    setBlogs(blogs.filter((b) => b.id !== id));
-    return { success: true };
+  const deleteBlog = async (id) => {
+    try {
+      const token = getToken();
+      const response = await fetch(`${API_URL}/blogs/${id}`, {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (response.ok) {
+        setBlogs(blogs.filter((b) => (b._id || b.id) !== id));
+        return { success: true };
+      } else {
+         const data = await response.json();
+         return { success: false, message: data.message };
+      }
+    } catch (error) {
+      console.error("Error deleting blog:", error);
+      return { success: false, message: error.message };
+    }
   };
 
   // Review Moderation
@@ -193,10 +256,15 @@ export const DataProvider = ({ children }) => {
     }
   };
 
+  const [reviews, setReviews] = useState(INITIAL_REVIEWS);
+  const [repairs, setRepairs] = useState(DUMMY_REPAIRS);
+
   return (
     <DataContext.Provider
       value={{
         blogs,
+        loadingBlogs,
+        fetchBlogs,
         addBlog,
         updateBlog: updateBlogData,
         deleteBlog,

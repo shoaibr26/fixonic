@@ -1,10 +1,15 @@
 import React from 'react';
+import { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useData } from '../../context/DataContext';
 import { Smartphone, Laptop, ShieldCheck, Clock, Star, ArrowRight } from 'lucide-react';
 
 const LandingPage = () => {
-  const { blogs, reviews } = useData();
+  const { blogs, reviews, fetchBlogs, loadingBlogs } = useData();
+  
+  useEffect(() => {
+    fetchBlogs();
+  }, [fetchBlogs]);
 
   const services = [
     { title: 'Mobile Repair', icon: <Smartphone className="w-8 h-8" />, desc: 'Screen, Battery, Camera, and Motherboard repairs.', color: 'text-lime-500', bg: 'bg-lime-500/10', iconBg: 'bg-lime-500' },
@@ -150,8 +155,22 @@ const LandingPage = () => {
             </Link>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
-            {blogs.slice(0, 2).map((blog) => (
-              <div key={blog.id} className="group flex flex-col md:flex-row bg-white rounded-[2rem] overflow-hidden border border-gray-100 hover:border-lime-200 transition-all cursor-pointer">
+            {loadingBlogs ? (
+               // Skeleton Loading
+               [...Array(2)].map((_, i) => (
+                 <div key={i} className="flex flex-col md:flex-row bg-white rounded-[2rem] overflow-hidden border border-gray-100 h-full animate-pulse">
+                   <div className="md:w-2/5 h-64 md:h-auto bg-gray-200"></div>
+                   <div className="p-8 md:w-3/5 flex flex-col justify-center gap-4">
+                     <div className="h-4 w-24 bg-gray-200 rounded"></div>
+                     <div className="h-8 w-full bg-gray-200 rounded"></div>
+                     <div className="h-4 w-full bg-gray-200 rounded"></div>
+                     <div className="h-4 w-32 bg-gray-200 rounded"></div>
+                   </div>
+                 </div>
+               ))
+            ) : blogs.length > 0 ? (
+            blogs.slice(0, 2).map((blog) => (
+              <div key={blog._id} className="group flex flex-col md:flex-row bg-white rounded-[2rem] overflow-hidden border border-gray-100 hover:border-lime-200 transition-all cursor-pointer">
                 <div className="md:w-2/5 h-64 md:h-auto relative overflow-hidden">
                     <img src={blog.image} alt={blog.title} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
                     <div className="absolute top-4 left-4 bg-white/90 backdrop-blur px-3 py-1 rounded-lg text-xs font-black text-navy-900 uppercase tracking-wider">
@@ -162,10 +181,20 @@ const LandingPage = () => {
                   <div className="text-xs font-bold text-gray-400 mb-3">{blog.date}</div>
                   <h3 className="text-2xl font-black text-navy-900 mb-4 leading-tight group-hover:text-lime-600 transition-colors">{blog.title}</h3>
                   <p className="text-gray-500 text-sm line-clamp-2 mb-6 font-medium leading-relaxed">{blog.content}</p>
-                  <Link to={`/journals/${blog.id}`} className="text-navy-900 font-bold text-sm underline decoration-2 decoration-lime-500 underline-offset-4 group-hover:decoration-navy-900 transition-all">Read Article</Link>
+                  <Link to={`/journals/${blog._id}`} className="text-navy-900 font-bold text-sm underline decoration-2 decoration-lime-500 underline-offset-4 group-hover:decoration-navy-900 transition-all">Read Article</Link>
                 </div>
               </div>
-            ))}
+            ))
+            ) : (
+                // Empty State for Landing Page
+              <div className="col-span-full py-16 bg-gray-50 rounded-[2.5rem] border border-dashed border-gray-200 flex flex-col items-center justify-center text-center p-8">
+                 <div className="p-4 bg-white rounded-full shadow-sm mb-4">
+                     <ArrowRight className="w-6 h-6 text-gray-400 rotate-45" />
+                 </div>
+                 <h3 className="text-lg font-black text-navy-900 mb-2">No Updates Yet</h3>
+                 <p className="text-gray-500 max-w-sm text-sm">Stay tuned! We'll be sharing our technical insights here very soon.</p>
+              </div>
+            )}
           </div>
         </div>
       </section>

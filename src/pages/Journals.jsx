@@ -1,10 +1,15 @@
 import { useNavigate } from 'react-router-dom';
 import { useData } from '../context/DataContext';
 import { ArrowRight, ArrowLeft } from 'lucide-react';
+import { useEffect } from 'react';
 
 const Journals = () => {
   const navigate = useNavigate();
-  const { blogs } = useData();
+  const { blogs, fetchBlogs, loadingBlogs } = useData();
+
+  useEffect(() => {
+    fetchBlogs();
+  }, [fetchBlogs]);
 
   return (
     <div className="bg-white font-sans selection:bg-lime-500 selection:text-white min-h-screen">
@@ -27,11 +32,26 @@ const Journals = () => {
 
           {/* Grid */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
-            {blogs.map((blog) => (
+            {loadingBlogs ? (
+              // Skeleton Loading
+              [...Array(6)].map((_, i) => (
+                <div key={i} className="flex flex-col bg-white rounded-[2.5rem] overflow-hidden border border-gray-100 h-full animate-pulse">
+                  <div className="h-64 bg-gray-200"></div>
+                  <div className="p-8 flex flex-col flex-1 gap-4">
+                    <div className="h-4 w-24 bg-gray-200 rounded"></div>
+                    <div className="h-8 w-full bg-gray-200 rounded"></div>
+                    <div className="h-4 w-full bg-gray-200 rounded"></div>
+                    <div className="h-4 w-2/3 bg-gray-200 rounded"></div>
+                    <div className="h-4 w-32 bg-gray-200 rounded mt-auto pt-6"></div>
+                  </div>
+                </div>
+              ))
+            ) : blogs.length > 0 ? (
+              blogs.map((blog) => (
               <div 
-                key={blog.id} 
+                key={blog._id} 
                 className="group flex flex-col bg-white rounded-[2.5rem] overflow-hidden border border-gray-100 hover:shadow-2xl hover:shadow-gray-200/50 hover:border-lime-200 transition-all duration-300 cursor-pointer h-full"
-                onClick={() => navigate(`/journals/${blog.id}`)}
+                onClick={() => navigate(`/journals/${blog._id}`)}
               >
                 <div className="h-64 relative overflow-hidden">
                     <img src={blog.image} alt={blog.title} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
@@ -52,7 +72,17 @@ const Journals = () => {
                   </div>
                 </div>
               </div>
-            ))}
+            ))
+          ) : (
+            // Empty State
+            <div className="col-span-full py-20 bg-gray-50 rounded-[2.5rem] border border-dashed border-gray-200 flex flex-col items-center justify-center text-center p-8">
+              <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mb-4">
+                  <ArrowRight className="w-6 h-6 text-gray-400 rotate-45" />
+              </div>
+              <h3 className="text-xl font-black text-navy-900 mb-2">No Articles Found</h3>
+              <p className="text-gray-500 max-w-sm">We're working on some fresh content! Check back soon for the latest repair guides and tech news.</p>
+            </div>
+          )}
           </div>
        </div>
     </div>

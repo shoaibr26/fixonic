@@ -1,17 +1,21 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Plus, Edit, Trash2, X, Image as ImageIcon } from 'lucide-react';
 import { useData } from '../../context/DataContext';
 import { useToast } from '../../context/ToastContext';
 import { useConfirm } from '../../context/ConfirmContext';
 
 const BlogManager = () => {
-  const { blogs, addBlog, updateBlog, deleteBlog } = useData();
+  const { blogs, addBlog, updateBlog, deleteBlog, fetchBlogs } = useData();
   const { showToast } = useToast();
   const { confirm } = useConfirm();
   const [showBlogModal, setShowBlogModal] = useState(false);
   const [editingBlog, setEditingBlog] = useState(null);
 
-  const handleBlogSubmit = (e) => {
+  useEffect(() => {
+    fetchBlogs();
+  }, [fetchBlogs]);
+
+  const handleBlogSubmit = async (e) => {
     e.preventDefault();
     const formData = new FormData(e.target);
     const blogData = {
@@ -22,11 +26,19 @@ const BlogManager = () => {
     };
 
     if (editingBlog) {
-      updateBlog({ ...editingBlog, ...blogData });
-      showToast('Blog updated successfully', 'success');
+      const result = await updateBlog({ ...editingBlog, ...blogData });
+      if (result.success) {
+        showToast('Blog updated successfully', 'success');
+      } else {
+        showToast('Failed to update blog', 'error');
+      }
     } else {
-      addBlog(blogData);
-      showToast('Blog published successfully', 'success');
+      const result = await addBlog(blogData);
+      if (result.success) {
+        showToast('Blog published successfully', 'success');
+      } else {
+        showToast('Failed to publish blog', 'error');
+      }
     }
     setShowBlogModal(false);
     setEditingBlog(null);
@@ -34,8 +46,12 @@ const BlogManager = () => {
 
   const handleDelete = async (id) => {
     if (await confirm('Delete Blog', 'Delete this blog post?')) {
-      deleteBlog(id);
-      showToast('Blog deleted successfully', 'success');
+      const result = await deleteBlog(id);
+      if (result.success) {
+        showToast('Blog deleted successfully', 'success');
+      } else {
+        showToast('Failed to delete blog', 'error');
+      }
     }
   };
 
@@ -66,7 +82,7 @@ const BlogManager = () => {
           </thead>
           <tbody className="divide-y divide-gray-50">
             {blogs.map((blog) => (
-              <tr key={blog.id}>
+              <tr key={blog._id}>
                 <td className="px-8 py-6">
                    <div className="flex items-center gap-4">
                      <img src={blog.image} className="w-16 h-16 rounded-2xl object-cover" alt="" />
@@ -85,7 +101,7 @@ const BlogManager = () => {
                     <Edit className="w-5 h-5" />
                   </button>
                   <button 
-                    onClick={() => handleDelete(blog.id)}
+                    onClick={() => handleDelete(blog._id)}
                     className="p-2 text-gray-300 hover:text-red-600"
                   >
                     <Trash2 className="w-5 h-5" />
@@ -93,6 +109,11 @@ const BlogManager = () => {
                 </td>
               </tr>
             ))}
+            {blogs.length === 0 && (
+              <tr>
+                <td colSpan="4" className="px-8 py-20 text-center text-gray-400">No blog posts found.</td>
+              </tr>
+            )}
           </tbody>
         </table>
       </div>
@@ -116,6 +137,7 @@ const BlogManager = () => {
                   <select name="category" required defaultValue={editingBlog?.category} className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary-500 outline-none font-bold">
                     <option value="Mobile">Mobile</option>
                     <option value="Laptop">Laptop</option>
+                    <option value="Desktop">Desktop</option>
                   </select>
                 </div>
               </div>

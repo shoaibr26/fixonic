@@ -5,6 +5,7 @@ import cors from 'cors'; // Import CORS to allow cross-origin requests
 import connectDB from './config/db.js'; // Import database connection function
 import authRoutes from './routes/authRoutes.js'; // Import authentication routes
 import contactRoutes from './routes/contactRoutes.js'; // Import contact form routes
+import blogRoutes from './routes/blogRoutes.js'; // Import blog routes
 
 dotenv.config(); // Initialize environment variables from .env file
 
@@ -17,6 +18,7 @@ app.use(express.json()); // Enable middleware to parse JSON request bodies
 
 app.use('/api/auth', authRoutes); // Register authentication routes under /api/auth
 app.use('/api/contact', contactRoutes); // Register contact routes under /api/contact
+app.use('/api/blogs', blogRoutes); // Register blog routes under /api/blogs
 
 // Define the root route to verify the server is running
 app.get('/', (req, res) => { // Handle GET requests to the root URL

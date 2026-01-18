@@ -1,13 +1,36 @@
 import { useNavigate, useParams } from 'react-router-dom';
 import { useData } from '../context/DataContext';
 import { ArrowLeft, Clock, Calendar, Tag, Share2, Facebook, Twitter, Linkedin } from 'lucide-react';
+import { useEffect } from 'react';
 
 const JournalDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { blogs } = useData();
+  const { blogs, fetchBlogs, loadingBlogs } = useData();
 
-  const blog = blogs.find(b => b.id.toString() === id);
+  useEffect(() => {
+    fetchBlogs();
+  }, [fetchBlogs]);
+
+  if (loadingBlogs) {
+    return (
+       <div className="bg-white font-sans selection:bg-lime-500 selection:text-white min-h-screen pb-20 animate-pulse">
+        {/* Skeleton Hero */}
+        <div className="relative h-[50vh] min-h-[400px] w-full bg-gray-200"></div>
+        {/* Skeleton Content */}
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 -mt-10 relative z-10">
+           <div className="bg-white rounded-[2.5rem] p-8 md:p-12 shadow-xl shadow-gray-200/50 border border-gray-100/50">
+               <div className="h-4 bg-gray-200 w-full mb-4 rounded"></div>
+               <div className="h-4 bg-gray-200 w-full mb-4 rounded"></div>
+               <div className="h-4 bg-gray-200 w-3/4 mb-8 rounded"></div>
+               <div className="h-40 bg-gray-200 w-full rounded"></div>
+           </div>
+        </div>
+       </div>
+    );
+  }
+
+  const blog = blogs.find(b => b._id === id);
 
   if (!blog) {
       return (
