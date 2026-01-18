@@ -1,15 +1,30 @@
 import React from 'react';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useData } from '../../context/DataContext';
-import { Smartphone, Laptop, ShieldCheck, Clock, Star, ArrowRight } from 'lucide-react';
+import { Smartphone, Laptop, ShieldCheck, Clock, Star, ArrowRight, ChevronLeft, ChevronRight } from 'lucide-react';
 
 const LandingPage = () => {
-  const { blogs, reviews, fetchBlogs, loadingBlogs } = useData();
+  const { blogs, reviews, fetchBlogs, loadingBlogs, fetchReviews, loadingReviews } = useData();
   
   useEffect(() => {
     fetchBlogs();
-  }, [fetchBlogs]);
+    fetchReviews();
+  }, [fetchBlogs, fetchReviews]);
+
+  const [currentReviewIndex, setCurrentReviewIndex] = useState(0);
+
+  const nextReview = () => {
+    if (reviews.length > 3) {
+      setCurrentReviewIndex((prev) => (prev + 1) % (reviews.length - 2));
+    }
+  };
+
+  const prevReview = () => {
+    if (reviews.length > 3) {
+      setCurrentReviewIndex((prev) => (prev - 1 + (reviews.length - 2)) % (reviews.length - 2));
+    }
+  };
 
   const services = [
     { title: 'Mobile Repair', icon: <Smartphone className="w-8 h-8" />, desc: 'Screen, Battery, Camera, and Motherboard repairs.', color: 'text-lime-500', bg: 'bg-lime-500/10', iconBg: 'bg-lime-500' },
@@ -207,20 +222,62 @@ const LandingPage = () => {
         </div>
 
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 text-center">
-          <span className="text-lime-400 font-extrabold tracking-widest uppercase text-sm">Testimonials</span>
-          <h2 className="mt-2 text-4xl md:text-5xl font-black text-white mb-20">Loved by Thousands</h2>
+          <div className="flex justify-between items-end mb-12 px-2">
+            <div className="text-left">
+              <span className="text-lime-400 font-extrabold tracking-widest uppercase text-sm">Testimonials</span>
+              <h2 className="mt-2 text-4xl md:text-5xl font-black text-white">Loved by Thousands</h2>
+            </div>
+            {reviews.length > 3 && (
+              <div className="flex gap-2">
+                <button onClick={prevReview} className="p-3 rounded-full bg-white/5 border border-white/10 text-white hover:bg-lime-500 hover:text-navy-900 transition-all">
+                  <ChevronLeft className="w-5 h-5" />
+                </button>
+                <button onClick={nextReview} className="p-3 rounded-full bg-white/5 border border-white/10 text-white hover:bg-lime-500 hover:text-navy-900 transition-all">
+                  <ChevronRight className="w-5 h-5" />
+                </button>
+              </div>
+            )}
+          </div>
           
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-left">
+          <div className="overflow-hidden">
+             
+            {loadingReviews ? (
+               <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-left">
+               {/* Skeleton Loading */}
+              {[...Array(3)].map((_, i) => (
+                <div key={i} className="bg-white/5 backdrop-blur-xl p-8 rounded-[2.5rem] border border-white/10 h-full animate-pulse">
+                   <div className="flex gap-1 mb-6">
+                      {[...Array(5)].map((_, j) => (
+                         <div key={j} className="w-5 h-5 bg-white/10 rounded-full"></div>
+                      ))}
+                   </div>
+                   <div className="h-4 w-full bg-white/10 rounded mb-4"></div>
+                   <div className="h-4 w-3/4 bg-white/10 rounded mb-8"></div>
+                   <div className="flex items-center gap-4 pt-6 border-t border-white/5 mt-auto">
+                     <div className="w-12 h-12 rounded-full bg-white/10"></div>
+                     <div className="flex-1">
+                        <div className="h-4 w-24 bg-white/10 rounded mb-2"></div>
+                        <div className="h-3 w-16 bg-white/10 rounded"></div>
+                     </div>
+                   </div>
+                </div>
+              ))}
+               </div>
+            ) : reviews.length > 0 ? (
+            <div 
+              className="flex gap-8 transition-transform duration-500 ease-out"
+              style={{ transform: `translateX(calc(-${currentReviewIndex} * (100% / 3 + 2rem)))` }}
+            >
             {reviews.map((review) => (
-              <div key={review.id} className="bg-white/5 backdrop-blur-xl p-8 rounded-[2.5rem] border border-white/10 hover:border-lime-500/50 transition-all duration-300 group">
+              <div key={review._id} className="min-w-[calc(100%)] md:min-w-[calc(33.333%-1.33rem)] bg-white/5 backdrop-blur-xl p-8 rounded-[2.5rem] border border-white/10 hover:border-lime-500/50 transition-all duration-300 group text-left flex flex-col h-auto">
                 <div className="flex gap-1 mb-6">
                   {[...Array(5)].map((_, j) => (
                     <Star key={j} className={`w-5 h-5 ${j < review.stars ? 'text-lime-400 fill-lime-400' : 'text-gray-600'}`} />
                   ))}
                 </div>
-                <p className="text-gray-300 mb-8 text-lg font-medium leading-relaxed">"{review.text}"</p>
-                <div className="flex items-center gap-4 pt-6 border-t border-white/5">
-                  <div className="w-12 h-12 rounded-full bg-gradient-to-br from-lime-400 to-emerald-500 flex items-center justify-center font-black text-navy-900 text-lg">
+                <p className="text-gray-300 mb-8 text-lg font-medium leading-relaxed flex-1">"{review.text}"</p>
+                <div className="flex items-center gap-4 pt-6 border-t border-white/5 mt-auto">
+                  <div className="w-12 h-12 rounded-full bg-gradient-to-br from-lime-400 to-emerald-500 flex items-center justify-center font-black text-navy-900 text-lg uppercase">
                     {review.name.charAt(0)}
                   </div>
                   <div>
@@ -230,6 +287,18 @@ const LandingPage = () => {
                 </div>
               </div>
             ))}
+            </div>
+            ) : (
+                // Empty State
+                 <div className="col-span-full py-20 bg-white/5 rounded-[2.5rem] border border-dashed border-white/10 flex flex-col items-center justify-center text-center p-8">
+                    <div className="w-16 h-16 bg-white/10 rounded-full flex items-center justify-center mb-4 text-gray-500">
+                        <Star className="w-8 h-8 opacity-50" />
+                    </div>
+                    <h3 className="text-xl font-black text-white mb-2">No Reviews Yet</h3>
+                    <p className="text-gray-400 max-w-sm">Be the first to share your experience with Fixonic!</p>
+                 </div>
+            )}
+            
           </div>
         </div>
       </section>

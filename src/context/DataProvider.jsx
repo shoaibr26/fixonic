@@ -107,25 +107,94 @@ export const DataProvider = ({ children }) => {
   };
 
   // Review Moderation
-  const deleteReview = (id) => {
-    setReviews(reviews.filter((r) => r.id !== id));
-    return { success: true };
+  // Review Moderation
+  const [reviews, setReviews] = useState([]);
+  const [loadingReviews, setLoadingReviews] = useState(true);
+
+  const fetchReviews = useCallback(async () => {
+    setLoadingReviews(true);
+    try {
+      const response = await fetch(`${API_URL}/reviews`);
+      const data = await response.json();
+      if (response.ok) {
+        setReviews(data);
+      }
+    } catch (error) {
+      console.error("Error fetching reviews:", error);
+    } finally {
+      setLoadingReviews(false);
+    }
+  }, []);
+
+  const addReview = async (reviewData) => {
+      try {
+        const token = getToken();
+        const response = await fetch(`${API_URL}/reviews`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${token}`,
+            },
+            body: JSON.stringify(reviewData),
+        });
+        const data = await response.json();
+        if (response.ok) {
+            setReviews([...reviews, data]);
+            return { success: true };
+        } else {
+            return { success: false, message: data.message };
+        }
+      } catch (error) {
+          console.error("Error adding review:", error);
+          return { success: false, message: error.message };
+      }
   };
 
-  // Repair Management
-  const addRepair = (repair) => {
-    setRepairs([repair, ...repairs]);
+  const updateReview = async (updatedReview) => {
+    try {
+        const token = getToken();
+        const response = await fetch(`${API_URL}/reviews/${updatedReview._id || updatedReview.id}`, {
+            method: "PUT",
+            headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${token}`,
+            },
+            body: JSON.stringify(updatedReview),
+        });
+        const data = await response.json();
+        if (response.ok) {
+            setReviews(reviews.map((r) => ((r._id || r.id) === (data._id || data.id) ? data : r)));
+            return { success: true };
+        } else {
+             return { success: false, message: data.message };
+        }
+    } catch (error) {
+        console.error("Error updating review:", error);
+        return { success: false, message: error.message };
+    }
   };
 
-  const updateRepairStatus = (id, newStatus) => {
-    setRepairs(
-      repairs.map((r) => (r.id === id ? { ...r, status: newStatus } : r)),
-    );
-  };
+  const deleteReview = async (id) => {
+    try {
+      const token = getToken();
+      const response = await fetch(`${API_URL}/reviews/${id}`, {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
 
-  const deleteRepair = (id) => {
-    setRepairs(repairs.filter((r) => r.id !== id));
-    return { success: true };
+      if (response.ok) {
+        setReviews(reviews.filter((r) => (r._id || r.id) !== id));
+        return { success: true };
+      } else {
+          const data = await response.json();
+          return { success: false, message: data.message };
+      }
+    } catch (error) {
+       console.error("Error deleting review:", error);
+       return { success: false, message: error.message };
+    }
   };
 
   // User Management
@@ -256,8 +325,23 @@ export const DataProvider = ({ children }) => {
     }
   };
 
-  const [reviews, setReviews] = useState(INITIAL_REVIEWS);
+  // Repair Management
   const [repairs, setRepairs] = useState(DUMMY_REPAIRS);
+  
+  const addRepair = (repair) => {
+    setRepairs([repair, ...repairs]);
+  };
+
+  const updateRepairStatus = (id, newStatus) => {
+    setRepairs(
+      repairs.map((r) => (r.id === id ? { ...r, status: newStatus } : r)),
+    );
+  };
+
+  const deleteRepair = (id) => {
+    setRepairs(repairs.filter((r) => r.id !== id));
+    return { success: true };
+  };
 
   return (
     <DataContext.Provider
@@ -269,6 +353,10 @@ export const DataProvider = ({ children }) => {
         updateBlog: updateBlogData,
         deleteBlog,
         reviews,
+        loadingReviews,
+        fetchReviews,
+        addReview,
+        updateReview,
         deleteReview,
         users,
         updateUser,

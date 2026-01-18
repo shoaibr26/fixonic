@@ -6,6 +6,7 @@ import connectDB from './config/db.js'; // Import database connection function
 import authRoutes from './routes/authRoutes.js'; // Import authentication routes
 import contactRoutes from './routes/contactRoutes.js'; // Import contact form routes
 import blogRoutes from './routes/blogRoutes.js'; // Import blog routes
+import reviewRoutes from './routes/reviewRoutes.js'; // Import review routes
 
 dotenv.config(); // Initialize environment variables from .env file
 
@@ -19,6 +20,7 @@ app.use(express.json()); // Enable middleware to parse JSON request bodies
 app.use('/api/auth', authRoutes); // Register authentication routes under /api/auth
 app.use('/api/contact', contactRoutes); // Register contact routes under /api/contact
 app.use('/api/blogs', blogRoutes); // Register blog routes under /api/blogs
+app.use('/api/reviews', reviewRoutes); // Register review routes under /api/reviews
 
 // Define the root route to verify the server is running
 app.get('/', (req, res) => { // Handle GET requests to the root URL
