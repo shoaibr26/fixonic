@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Briefcase, Clock, CheckCircle2, AlertCircle, Smartphone, Laptop, MapPin } from 'lucide-react';
 import { useData } from '../../context/DataContext';
+import Modal from '../../components/Modal';
 
 const VendorDashboard = () => {
   const { repairs, updateRepairStatus } = useData();
@@ -193,10 +194,14 @@ const VendorDashboard = () => {
       </div>
 
       {/* Repair Detail Modal */}
-      {selectedRepair && (
-          <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-navy-900/60 backdrop-blur-sm animate-fade-in">
-             <div className="bg-white w-full max-w-2xl rounded-[2.5rem] shadow-2xl overflow-hidden animate-slide-up relative">
-                 <div className="absolute top-0 right-0 p-8">
+      <Modal
+         isOpen={!!selectedRepair}
+         onClose={() => setSelectedRepair(null)}
+         size="max-w-2xl"
+      >
+         {selectedRepair && (
+             <div className="relative">
+                 <div className="absolute top-0 right-0 p-8 z-10">
                      <button 
                         onClick={() => setSelectedRepair(null)}
                         className="p-2 bg-gray-50 rounded-full hover:bg-gray-100 transition-colors"
@@ -274,8 +279,8 @@ const VendorDashboard = () => {
                      </button>
                  </div>
              </div>
-          </div>
-      )}
+         )}
+      </Modal>
     </div>
   );
 };

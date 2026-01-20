@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Trash2, Plus, Edit, X, Star } from 'lucide-react';
+import Modal from '../../components/Modal';
 import { useData } from '../../context/DataContext';
 import { useToast } from '../../context/ToastContext';
 import { useConfirm } from '../../context/ConfirmContext';
@@ -110,36 +111,33 @@ const ReviewModeration = () => {
       </div>
 
        {/* Review Modal */}
-       {showReviewModal && (
-        <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-gray-900/40 backdrop-blur-sm">
-          <div className="bg-white w-full max-w-lg rounded-3xl shadow-2xl overflow-hidden border border-gray-100">
-            <div className="p-8 border-b border-gray-50 flex items-center justify-between">
-              <h2 className="text-2xl font-black text-gray-900">{editingReview ? 'Edit' : 'Add'} Review</h2>
-              <button onClick={() => setShowReviewModal(false)} className="text-gray-400 hover:text-gray-600"><X /></button>
+      <Modal
+        isOpen={showReviewModal}
+        onClose={() => setShowReviewModal(false)}
+        title={editingReview ? 'Edit Review' : 'Add Review'}
+        size="max-w-lg"
+      >
+        <form onSubmit={handleReviewSubmit} className="p-8 space-y-6">
+            <div>
+              <label className="block text-xs font-black text-gray-400 uppercase tracking-widest mb-2 ml-1">Client Name</label>
+              <input name="name" required defaultValue={editingReview?.name} className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-navy-500 focus:border-navy-500 rounded-xl bg-navy-50/50 border-navy-100 transition-all" placeholder="John Doe" />
             </div>
-            <form onSubmit={handleReviewSubmit} className="p-8 space-y-6">
-                <div>
-                  <label className="block text-xs font-black text-gray-400 uppercase tracking-widest mb-2 ml-1">Client Name</label>
-                  <input name="name" required defaultValue={editingReview?.name} className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-navy-500 focus:border-navy-500 rounded-xl bg-navy-50/50 border-navy-100 transition-all" placeholder="John Doe" />
-                </div>
-                <div>
-                  <label className="block text-xs font-black text-gray-400 uppercase tracking-widest mb-2 ml-1">Review Text</label>
-                  <textarea name="text" required defaultValue={editingReview?.text} className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-navy-500 focus:border-navy-500 rounded-xl bg-navy-50/50 border-navy-100 transition-all h-32" placeholder="Great service..." />
-                </div>
-                <div>
-                  <label className="block text-xs font-black text-gray-400 uppercase tracking-widest mb-2 ml-1">Rating (Stars)</label>
-                  <div className="relative">
-                    <Star className="absolute left-4 top-3.5 w-5 h-5 text-amber-400 fill-amber-400" />
-                    <input name="stars" type="number" min="1" max="5" required defaultValue={editingReview?.stars || 5} className="w-full pl-12 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-navy-500 focus:border-navy-500 rounded-xl bg-navy-50/50 border-navy-100 transition-all" />
-                  </div>
-                </div>
-               <button type="submit" className="w-full py-5 bg-navy-500 text-white rounded-2xl font-black shadow-xl shadow-navy-900/20 hover:bg-navy-600 transition-all uppercase tracking-[0.2em] text-sm">
-                Save Review
-              </button>
-            </form>
-          </div>
-        </div>
-      )}
+            <div>
+              <label className="block text-xs font-black text-gray-400 uppercase tracking-widest mb-2 ml-1">Review Text</label>
+              <textarea name="text" required defaultValue={editingReview?.text} className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-navy-500 focus:border-navy-500 rounded-xl bg-navy-50/50 border-navy-100 transition-all h-32" placeholder="Great service..." />
+            </div>
+            <div>
+              <label className="block text-xs font-black text-gray-400 uppercase tracking-widest mb-2 ml-1">Rating (Stars)</label>
+              <div className="relative">
+                <Star className="absolute left-4 top-3.5 w-5 h-5 text-amber-400 fill-amber-400" />
+                <input name="stars" type="number" min="1" max="5" required defaultValue={editingReview?.stars || 5} className="w-full pl-12 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-navy-500 focus:border-navy-500 rounded-xl bg-navy-50/50 border-navy-100 transition-all" />
+              </div>
+            </div>
+            <button type="submit" className="w-full py-5 bg-navy-500 text-white rounded-2xl font-black shadow-xl shadow-navy-900/20 hover:bg-navy-600 transition-all uppercase tracking-[0.2em] text-sm">
+            Save Review
+          </button>
+        </form>
+      </Modal>
     </div>
   );
 };

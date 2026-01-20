@@ -3,6 +3,7 @@ import { useAuth } from "../context/AuthContextHooks";
 import { useToast } from "../context/ToastContext";
 import { useConfirm } from "../context/ConfirmContext";
 import { Settings, User, Trash2, X, AlertTriangle } from "lucide-react";
+import Modal from "../components/Modal";
 import ClientDashboard from "./client/ClientDashboard";
 import VendorDashboard from "./vendor/VendorDashboard";
 import AdminDashboard from "./admin/AdminDashboard";
@@ -125,81 +126,70 @@ const Dashboard = () => {
       {renderDashboard()}
 
       {/* Profile Modal */}
-      {showProfileModal && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-navy-900/60 backdrop-blur-sm animate-fade-in">
-          <div className="bg-white w-full max-w-lg rounded-[2.5rem] shadow-2xl overflow-hidden animate-slide-up">
-            <div className="p-8 border-b border-gray-50 flex items-center justify-between">
-              <h2 className="text-2xl font-black text-navy-900">
-                Profile Settings
-              </h2>
-              <button
-                onClick={() => setShowProfileModal(false)}
-                className="text-gray-400 hover:text-navy-900"
-              >
-                <X />
-              </button>
+      <Modal
+        isOpen={showProfileModal}
+        onClose={() => setShowProfileModal(false)}
+        title="Profile Settings"
+        size="max-w-lg"
+      >
+        <form onSubmit={handleUpdate} className="p-8 space-y-6">
+          <div className="space-y-4">
+            <div>
+              <label className="block text-xs font-black text-gray-400 uppercase tracking-widest mb-2 ml-1">
+                Full Name
+              </label>
+              <div className="relative">
+                <User className="absolute left-4 top-3.5 w-5 h-5 text-gray-400" />
+                <input
+                  name="name"
+                  required
+                  defaultValue={user?.name}
+                  className="w-full pl-12 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-navy-500 focus:border-navy-500 rounded-xl bg-navy-50/50 border-navy-100 transition-all font-bold text-navy-900"
+                />
+              </div>
             </div>
-
-            <form onSubmit={handleUpdate} className="p-8 space-y-6">
-              <div className="space-y-4">
-                <div>
-                  <label className="block text-xs font-black text-gray-400 uppercase tracking-widest mb-2 ml-1">
-                    Full Name
-                  </label>
-                  <div className="relative">
-                    <User className="absolute left-4 top-3.5 w-5 h-5 text-gray-400" />
-                    <input
-                      name="name"
-                      required
-                      defaultValue={user?.name}
-                      className="w-full pl-12 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-navy-500 focus:border-navy-500 rounded-xl bg-navy-50/50 border-navy-100 transition-all font-bold text-navy-900"
-                    />
-                  </div>
-                </div>
-                <div>
-                  <label className="block text-xs font-black text-gray-400 uppercase tracking-widest mb-2 ml-1">
-                    Email Address
-                  </label>
-                  <input
-                    name="email"
-                    type="email"
-                    required
-                    defaultValue={user?.email}
-                    className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-navy-500 focus:border-navy-500 rounded-xl bg-navy-50/50 border-navy-100 transition-all font-bold text-navy-900"
-                  />
-                </div>
-                <div>
-                  <label className="block text-xs font-black text-gray-400 uppercase tracking-widest mb-2 ml-1">
-                    New Password (Optional)
-                  </label>
-                  <input
-                    name="password"
-                    type="password"
-                    className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-navy-500 focus:border-navy-500 rounded-xl bg-navy-50/50 border-navy-100 transition-all font-bold text-navy-900"
-                    placeholder="••••••••"
-                  />
-                </div>
-              </div>
-
-              <div className="pt-4 flex flex-col gap-3">
-                <button
-                  type="submit"
-                  className="w-full py-4 bg-navy-900 text-white rounded-xl font-black shadow-xl shadow-navy-900/20 hover:bg-navy-800 transition-all uppercase tracking-widest text-xs"
-                >
-                  Save Changes
-                </button>
-                <button
-                  type="button"
-                  onClick={handleDelete}
-                  className="w-full py-4 bg-red-50 text-red-600 rounded-xl font-black hover:bg-red-100 transition-all uppercase tracking-widest text-xs flex items-center justify-center gap-2"
-                >
-                  <Trash2 className="w-4 h-4" /> Delete Account
-                </button>
-              </div>
-            </form>
+            <div>
+              <label className="block text-xs font-black text-gray-400 uppercase tracking-widest mb-2 ml-1">
+                Email Address
+              </label>
+              <input
+                name="email"
+                type="email"
+                required
+                defaultValue={user?.email}
+                className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-navy-500 focus:border-navy-500 rounded-xl bg-navy-50/50 border-navy-100 transition-all font-bold text-navy-900"
+              />
+            </div>
+            <div>
+              <label className="block text-xs font-black text-gray-400 uppercase tracking-widest mb-2 ml-1">
+                New Password (Optional)
+              </label>
+              <input
+                name="password"
+                type="password"
+                className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-navy-500 focus:border-navy-500 rounded-xl bg-navy-50/50 border-navy-100 transition-all font-bold text-navy-900"
+                placeholder="••••••••"
+              />
+            </div>
           </div>
-        </div>
-      )}
+
+          <div className="pt-4 flex flex-col gap-3">
+            <button
+              type="submit"
+              className="w-full py-4 bg-navy-900 text-white rounded-xl font-black shadow-xl shadow-navy-900/20 hover:bg-navy-800 transition-all uppercase tracking-widest text-xs"
+            >
+              Save Changes
+            </button>
+            <button
+              type="button"
+              onClick={handleDelete}
+              className="w-full py-4 bg-red-50 text-red-600 rounded-xl font-black hover:bg-red-100 transition-all uppercase tracking-widest text-xs flex items-center justify-center gap-2"
+            >
+              <Trash2 className="w-4 h-4" /> Delete Account
+            </button>
+          </div>
+        </form>
+      </Modal>
     </div>
   );
 };

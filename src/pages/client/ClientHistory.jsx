@@ -10,6 +10,7 @@ import {
   X,
 } from "lucide-react";
 import { useData } from "../../context/DataContext";
+import RepairDetailModal from "../../components/RepairDetailModal";
 
 const ClientHistory = () => {
   const navigate = useNavigate();
@@ -172,147 +173,10 @@ const ClientHistory = () => {
       </div>
 
       {/* Repair Detail Modal */}
-      {selectedRepair && (
-        <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-navy-900/60 backdrop-blur-sm animate-fade-in">
-          <div className="bg-white w-full max-w-2xl rounded-[2.5rem] shadow-2xl overflow-hidden animate-slide-up relative">
-            <div className="absolute top-0 right-0 p-8">
-              <button
-                onClick={() => setSelectedRepair(null)}
-                className="p-2 bg-gray-50 rounded-full hover:bg-gray-100 transition-colors"
-              >
-                <X className="w-6 h-6 text-gray-500" />
-              </button>
-            </div>
-
-            <div className="p-10 pb-0">
-              <div className="inline-flex items-center gap-3 px-4 py-2 bg-navy-50 rounded-2xl mb-6">
-                <span className="text-[10px] font-black text-navy-400 uppercase tracking-widest">
-                  Repair ID
-                </span>
-                <span className="text-sm font-black text-navy-900">
-                  #{selectedRepair.id}
-                </span>
-              </div>
-              <h2 className="text-4xl font-black text-navy-900 mb-2">
-                {selectedRepair.brand} {selectedRepair.model}
-              </h2>
-              <p className="text-gray-500 font-medium flex items-center gap-2">
-                <ArrowUpRight className="w-4 h-4 text-lime-500" /> Submitted on{" "}
-                {selectedRepair.date}
-              </p>
-            </div>
-
-            <div className="p-10 space-y-8">
-              <div className="grid grid-cols-2 gap-6">
-                <div className="p-6 rounded-3xl bg-gray-50 border border-gray-100">
-                  <div className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-3">
-                    Device Info
-                  </div>
-                  <div className="flex items-center gap-4">
-                    <div
-                      className={`p-4 rounded-2xl ${selectedRepair.device === "Mobile" ? "bg-navy-900 text-white" : "bg-lime-500 text-navy-900"}`}
-                    >
-                      {selectedRepair.device === "Mobile" ? (
-                        <Smartphone className="w-6 h-6" />
-                      ) : (
-                        <Laptop className="w-6 h-6" />
-                      )}
-                    </div>
-                    <div className="min-w-0">
-                      <div className="font-black text-lg text-navy-900 truncate">
-                        {selectedRepair.brand}
-                      </div>
-                      <div className="font-medium text-gray-500 text-sm truncate">
-                        {selectedRepair.model}
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                <div className="p-6 rounded-3xl bg-gray-50 border border-gray-100">
-                  <div className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-3">
-                    Reported Issue
-                  </div>
-                  <div className="font-bold text-navy-900 text-lg leading-tight mb-2">
-                    {selectedRepair.issue}
-                  </div>
-                  <div
-                    className={`text-xs font-bold px-3 py-1 rounded-lg inline-block border ${statusColors[selectedRepair.status]}`}
-                  >
-                    {selectedRepair.status}
-                  </div>
-                </div>
-              </div>
-
-              <div>
-                <div className="flex items-center justify-between mb-4">
-                  <div className="text-[10px] font-black text-gray-400 uppercase tracking-widest">
-                    Repair Timeline
-                  </div>
-                </div>
-                <div className="bg-gray-50 rounded-3xl p-6 border border-gray-100">
-                  <div className="flex items-center justify-between relative">
-                    {/* Simple timeline visual for demo */}
-                    {[
-                      "Pending",
-                      "Accepted",
-                      "In Process",
-                      "Ready",
-                      "Completed",
-                    ].map((step, i) => {
-                      const isCompleted =
-                        [
-                          "Pending",
-                          "Accepted",
-                          "In Process",
-                          "Ready",
-                          "Completed",
-                        ].indexOf(selectedRepair.status) >= i;
-                      return (
-                        <div
-                          key={step}
-                          className="flex flex-col items-center relative z-10"
-                        >
-                          <div
-                            className={`w-8 h-8 rounded-full flex items-center justify-center text-[10px] font-black border-4 transition-all ${
-                              isCompleted
-                                ? "bg-lime-500 border-lime-500 text-navy-900"
-                                : "bg-white border-gray-200 text-gray-300"
-                            }`}
-                          >
-                            {i + 1}
-                          </div>
-                          <span
-                            className={`text-[10px] font-bold mt-2 uppercase tracking-wide ${isCompleted ? "text-navy-900" : "text-gray-300"}`}
-                          >
-                            {step}
-                          </span>
-                        </div>
-                      );
-                    })}
-                    <div className="absolute top-4 left-0 w-full h-1 bg-gray-200 -z-0">
-                      <div
-                        className="h-full bg-lime-500 transition-all duration-500"
-                        style={{
-                          width: `${(["Pending", "Accepted", "In Process", "Ready", "Completed"].indexOf(selectedRepair.status) / 4) * 100}%`,
-                        }}
-                      ></div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div className="bg-gray-50 px-10 py-8 border-t border-gray-100 text-center">
-              <button
-                onClick={() => setSelectedRepair(null)}
-                className="text-gray-400 font-bold hover:text-navy-900 transition-colors text-sm uppercase tracking-widest"
-              >
-                Close Details
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      <RepairDetailModal
+        repair={selectedRepair}
+        onClose={() => setSelectedRepair(null)}
+      />
     </div>
   );
 };

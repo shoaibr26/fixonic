@@ -1,8 +1,9 @@
 import { useState, useEffect } from 'react';
-import { Plus, Edit, Trash2, X, Image as ImageIcon } from 'lucide-react';
+import { Plus, Edit, Trash2, Image as ImageIcon } from 'lucide-react';
 import { useData } from '../../context/DataContext';
 import { useToast } from '../../context/ToastContext';
 import { useConfirm } from '../../context/ConfirmContext';
+import Modal from '../../components/Modal';
 
 const BlogManager = () => {
   const { blogs, addBlog, updateBlog, deleteBlog, fetchBlogs } = useData();
@@ -119,46 +120,43 @@ const BlogManager = () => {
       </div>
 
       {/* Blog Modal */}
-      {showBlogModal && (
-        <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-gray-900/40 backdrop-blur-sm">
-          <div className="bg-white w-full max-w-2xl rounded-3xl shadow-2xl overflow-hidden border border-gray-100">
-            <div className="p-8 border-b border-gray-50 flex items-center justify-between">
-              <h2 className="text-2xl font-black text-gray-900">{editingBlog ? 'Edit' : 'Create'} Blog Post</h2>
-              <button onClick={() => setShowBlogModal(false)} className="text-gray-400 hover:text-gray-600"><X /></button>
+      <Modal
+        isOpen={showBlogModal}
+        onClose={() => setShowBlogModal(false)}
+        title={editingBlog ? 'Edit Blog Post' : 'Create Blog Post'}
+        size="max-w-2xl"
+      >
+        <form onSubmit={handleBlogSubmit} className="p-8 space-y-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+              <label className="block text-xs font-black text-gray-400 uppercase tracking-widest mb-2 ml-1">Title</label>
+              <input name="title" required defaultValue={editingBlog?.title} className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-navy-500 focus:border-navy-500 rounded-xl bg-navy-50/50 border-navy-100 transition-all" placeholder="Ex: New iPhone Tips" />
             </div>
-            <form onSubmit={handleBlogSubmit} className="p-8 space-y-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div>
-                  <label className="block text-xs font-black text-gray-400 uppercase tracking-widest mb-2 ml-1">Title</label>
-                  <input name="title" required defaultValue={editingBlog?.title} className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-navy-500 focus:border-navy-500 rounded-xl bg-navy-50/50 border-navy-100 transition-all" placeholder="Ex: New iPhone Tips" />
-                </div>
-                <div>
-                  <label className="block text-xs font-black text-gray-400 uppercase tracking-widest mb-2 ml-1">Category</label>
-                  <select name="category" required defaultValue={editingBlog?.category} className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary-500 outline-none font-bold">
-                    <option value="Mobile">Mobile</option>
-                    <option value="Laptop">Laptop</option>
-                    <option value="Desktop">Desktop</option>
-                  </select>
-                </div>
-              </div>
-              <div>
-                <label className="block text-xs font-black text-gray-400 uppercase tracking-widest mb-2 ml-1">Image URL</label>
-                <div className="relative">
-                  <ImageIcon className="absolute left-4 top-3.5 w-5 h-5 text-gray-400" />
-                  <input name="image" required defaultValue={editingBlog?.image} className="w-full pl-12 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-navy-500 focus:border-navy-500 rounded-xl bg-navy-50/50 border-navy-100 transition-all" placeholder="https://unsplash.com/..." />
-                </div>
-              </div>
-              <div>
-                <label className="block text-xs font-black text-gray-400 uppercase tracking-widest mb-2 ml-1">Content (Rich Text Mockup)</label>
-                <textarea name="content" required defaultValue={editingBlog?.content} className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-navy-500 focus:border-navy-500 rounded-xl bg-navy-50/50 border-navy-100 transition-all h-40" placeholder="Write something amazing..." />
-              </div>
-               <button type="submit" className="w-full py-5 bg-navy-500 text-white rounded-2xl font-black shadow-xl shadow-navy-900/20 hover:bg-navy-600 transition-all uppercase tracking-[0.2em] text-sm">
-                {editingBlog ? 'Save Changes' : 'Publish Blog'}
-              </button>
-            </form>
+            <div>
+              <label className="block text-xs font-black text-gray-400 uppercase tracking-widest mb-2 ml-1">Category</label>
+              <select name="category" required defaultValue={editingBlog?.category} className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary-500 outline-none font-bold">
+                <option value="Mobile">Mobile</option>
+                <option value="Laptop">Laptop</option>
+                <option value="Desktop">Desktop</option>
+              </select>
+            </div>
           </div>
-        </div>
-      )}
+          <div>
+            <label className="block text-xs font-black text-gray-400 uppercase tracking-widest mb-2 ml-1">Image URL</label>
+            <div className="relative">
+              <ImageIcon className="absolute left-4 top-3.5 w-5 h-5 text-gray-400" />
+              <input name="image" required defaultValue={editingBlog?.image} className="w-full pl-12 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-navy-500 focus:border-navy-500 rounded-xl bg-navy-50/50 border-navy-100 transition-all" placeholder="https://unsplash.com/..." />
+            </div>
+          </div>
+          <div>
+            <label className="block text-xs font-black text-gray-400 uppercase tracking-widest mb-2 ml-1">Content (Rich Text Mockup)</label>
+            <textarea name="content" required defaultValue={editingBlog?.content} className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-navy-500 focus:border-navy-500 rounded-xl bg-navy-50/50 border-navy-100 transition-all h-40" placeholder="Write something amazing..." />
+          </div>
+           <button type="submit" className="w-full py-5 bg-navy-500 text-white rounded-2xl font-black shadow-xl shadow-navy-900/20 hover:bg-navy-600 transition-all uppercase tracking-[0.2em] text-sm">
+            {editingBlog ? 'Save Changes' : 'Publish Blog'}
+          </button>
+        </form>
+      </Modal>
     </div>
   );
 };
