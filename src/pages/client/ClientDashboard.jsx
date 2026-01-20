@@ -1,42 +1,70 @@
 import { Link } from "react-router-dom";
-import { useState } from "react";
-import { BRANDS } from "../../data/mockData";
+import { useState, useEffect } from "react";
 import {
   Laptop,
   Smartphone,
   CheckCircle,
   ArrowRight,
   Upload,
-  X,
+  Search,
+  Monitor,
+  Trash2,
+  Eye,
 } from "lucide-react";
 import { useAuth } from "../../context/AuthContextHooks";
 import { useData } from "../../context/DataContext";
 import { useConfirm } from "../../context/ConfirmContext";
 import RepairDetailModal from "../../components/RepairDetailModal";
+import Table from "../../components/Table";
 
 const ClientDashboard = () => {
   const { user } = useAuth();
-  const { repairs, addRepair, deleteRepair } = useData();
+  const [currentPage, setCurrentPage] = useState(1);
+  const { 
+    repairs, 
+    repairMeta, 
+    loadingRepairs, 
+    fetchRepairs, 
+    brands, 
+    fetchBrands, 
+    users, 
+    fetchUsers,
+    addRepair,
+    deleteRepair
+  } = useData();
   const { confirm } = useConfirm();
   const [step, setStep] = useState(1);
   const [selectedRepair, setSelectedRepair] = useState(null);
-  const requests = (repairs || []).filter((r) =>
-    ["Pending", "In Process"].includes(r.status),
-  );
+  const [searchTerm, setSearchTerm] = useState("");
+  const [filterStatus, setFilterStatus] = useState("All");
+
+  useEffect(() => {
+    fetchRepairs({ page: currentPage, search: searchTerm, status: filterStatus });
+    fetchBrands();
+    fetchUsers();
+  }, [fetchRepairs, fetchBrands, fetchUsers, currentPage, searchTerm, filterStatus]);
+
+  const requests = repairs || [];
+
   const [bookingData, setBookingData] = useState({
     device: "",
     brand: "",
     model: "",
     issue: "",
     address: "",
+    vendorId: "",
     image: null,
   });
+
+  const vendors = (users || []).filter(u => u.role === 'vendor');
+  const availableBrands = (brands || []).filter(b => b.type === bookingData.device);
 
   const handleBooking = (e) => {
     e.preventDefault();
     const newReq = {
       id: `REP-${Math.floor(Math.random() * 900) + 100}`,
       customer: user?.name,
+      customerId: user?._id || user?.id,
       device: bookingData.device,
       brand: bookingData.brand,
       model: bookingData.model,
@@ -44,7 +72,7 @@ const ClientDashboard = () => {
       address: bookingData.address,
       status: "Pending",
       date: new Date().toISOString().split("T")[0],
-      vendor: null,
+      vendorId: bookingData.vendorId || null, 
       history: ["Pending"],
     };
     addRepair(newReq);
@@ -153,8 +181,8 @@ const ClientDashboard = () => {
                   </h3>
                 </div>
 
-                <div className="grid grid-cols-2 gap-6">
-                  {["Mobile", "Laptop"].map((type) => (
+                <div className="grid grid-cols-3 gap-4">
+                  {["Mobile", "Laptop", "Desktop"].map((type) => (
                     <button
                       key={type}
                       type="button"
@@ -187,8 +215,10 @@ const ClientDashboard = () => {
                       >
                         {type === "Mobile" ? (
                           <Smartphone className="w-8 h-8" />
-                        ) : (
+                        ) : type === "Laptop" ? (
                           <Laptop className="w-8 h-8" />
+                        ) : (
+                          <Monitor className="w-8 h-8" />
                         )}
                       </div>
 
@@ -210,7 +240,9 @@ const ClientDashboard = () => {
                       >
                         {type === "Mobile"
                           ? "Screen, Battery, etc."
-                          : "Keyboard, Screen, etc."}
+                          : type === "Laptop" 
+                          ? "Keyboard, Screen, etc."
+                          : "Hardware, Software, etc."}
                       </p>
                     </button>
                   ))}
@@ -247,9 +279,9 @@ const ClientDashboard = () => {
                         required
                       >
                         <option value="">Select Brand</option>
-                        {BRANDS[bookingData.device].map((b) => (
-                          <option key={b} value={b}>
-                            {b}
+                        {availableBrands.map((b) => (
+                          <option key={b._id} value={b.name}>
+                            {b.name}
                           </option>
                         ))}
                       </select>
@@ -265,7 +297,13 @@ const ClientDashboard = () => {
                     <input
                       type="text"
                       className="w-full px-5 py-4 bg-gray-50 border-2 border-transparent rounded-2xl outline-none focus:bg-white focus:border-lime-500 focus:shadow-xl focus:shadow-lime-500/10 transition-all font-bold text-navy-900 placeholder:text-gray-400"
-                      placeholder="e.g. iPhone 14 Pro"
+                      placeholder={
+                        bookingData.device === "Mobile"
+                          ? "e.g. iPhone 14 Pro"
+                          : bookingData.device === "Laptop"
+                          ? "e.g. MacBook Pro"
+                          : "e.g. Alienware Aurora"
+                      }
                       value={bookingData.model}
                       onChange={(e) =>
                         setBookingData({
@@ -347,6 +385,34 @@ const ClientDashboard = () => {
 
                   <div className="space-y-2">
                     <label className="text-xs font-black text-gray-400 uppercase tracking-widest ml-1">
+                      Prefer Vendor (Optional)
+                    </label>
+                    <div className="relative">
+                       <select
+                         className="w-full px-5 py-4 bg-gray-50 border-2 border-transparent rounded-2xl outline-none focus:bg-white focus:border-lime-500 focus:shadow-xl focus:shadow-lime-500/10 transition-all font-bold text-navy-900 appearance-none cursor-pointer"
+                         value={bookingData.vendorId}
+                         onChange={(e) =>
+                           setBookingData({
+                             ...bookingData,
+                             vendorId: e.target.value,
+                           })
+                         }
+                       >
+                         <option value="">Select Vendor</option>
+                         {vendors.map((v) => (
+                           <option key={v._id} value={v._id}>
+                             {v.name}
+                           </option>
+                         ))}
+                       </select>
+                         <div className="absolute right-5 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400">
+                           <ArrowRight className="w-4 h-4 rotate-90" />
+                         </div>
+                    </div>
+                  </div>
+
+                  <div className="space-y-2">
+                    <label className="text-xs font-black text-gray-400 uppercase tracking-widest ml-1">
                       Photo (Optional)
                     </label>
                     <div className="border-2 border-dashed border-gray-200 rounded-3xl p-8 text-center bg-gray-50 group cursor-pointer hover:border-lime-500 hover:bg-lime-50/10 transition-all duration-300">
@@ -383,120 +449,139 @@ const ClientDashboard = () => {
 
       {/* Tracking Section */}
       <div className="space-y-8 mt-12">
-        <div className="flex items-end justify-between px-4">
-          <div>
-            <h2 className="text-3xl font-black text-navy-900">
-              Active Repairs
-            </h2>
-            <p className="text-gray-500 font-medium">
-              Track the live status of your devices
-            </p>
+        <div className="space-y-4 px-4 sm:px-0">
+          <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
+            <div>
+              <h2 className="text-3xl font-black text-navy-900">
+                My Repairs
+              </h2>
+              <p className="text-gray-500 font-medium">
+                Manage and track all your service requests
+              </p>
+            </div>
           </div>
-          <Link
-            to="/client/history"
-            className="text-navy-900 font-bold flex items-center text-sm hover:text-lime-600 transition-colors uppercase tracking-wide bg-white px-5 py-2.5 rounded-xl shadow-sm border border-gray-100 mb-1"
-          >
-            History <ArrowRight className="w-4 h-4 ml-2" />
-          </Link>
-        </div>
 
-        <div className="grid grid-cols-1 gap-6">
-          {requests.map((req) => (
-            <div
-              key={req.id}
-              className="bg-white p-8 rounded-[2rem] shadow-xl shadow-gray-200/50 border border-gray-100 hover:shadow-2xl hover:shadow-gray-200 transition-all group relative overflow-hidden"
-            >
-              <div
-                className={`absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-gray-50 to-gray-100 rounded-bl-[100px] -mr-8 -mt-8 transition-transform group-hover:scale-150`}
-              ></div>
-
-              <div className="relative z-10 flex flex-col md:flex-row md:items-center gap-8">
-                <div className="flex items-start gap-6 md:w-[280px] lg:w-[320px] shrink-0">
-                  <div
-                    className={`w-20 h-20 rounded-2xl flex items-center justify-center shadow-lg shrink-0 ${
-                      req.device === "Mobile"
-                        ? "bg-navy-900 text-lime-400"
-                        : "bg-lime-500 text-navy-900"
+          <div className="bg-white p-4 rounded-3xl border border-gray-100 shadow-sm flex flex-col md:flex-row gap-4 justify-between">
+            <div className="relative flex-1">
+              <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+              <input
+                type="text"
+                placeholder="Search by ID, Device, Model..."
+                className="w-full pl-12 pr-4 py-3 bg-gray-50 border-none rounded-2xl font-bold text-navy-900 placeholder:text-gray-400 focus:ring-2 focus:ring-lime-500 transition-all outline-none"
+                value={searchTerm}
+                onChange={(e) => {
+                  setSearchTerm(e.target.value);
+                  setCurrentPage(1);
+                }}
+              />
+            </div>
+            <div className="flex items-center gap-2 overflow-x-auto pb-2 md:pb-0 scrollbar-hide">
+              {["All", "Pending", "In Process", "Completed", "Rejected"].map(
+                (status) => (
+                  <button
+                    key={status}
+                    onClick={() => {
+                      setFilterStatus(status);
+                      setCurrentPage(1);
+                    }}
+                    className={`px-6 py-3 rounded-2xl font-black text-xs uppercase tracking-wider whitespace-nowrap transition-all ${
+                      filterStatus === status
+                        ? "bg-navy-900 text-white"
+                        : "bg-gray-50 text-gray-400 hover:bg-gray-100"
                     }`}
                   >
-                    {req.device === "Mobile" ? (
-                      <Smartphone className="w-10 h-10" />
-                    ) : (
-                      <Laptop className="w-10 h-10" />
-                    )}
+                    {status}
+                  </button>
+                ),
+              )}
+            </div>
+          </div>
+        </div>
+
+        <Table
+          data={requests}
+          pagination={{
+            page: repairMeta.page,
+            pages: repairMeta.pages,
+            total: repairMeta.total,
+            onPageChange: (newPage) => setCurrentPage(newPage)
+          }}
+          emptyState={
+            <div className="text-center py-16 bg-gray-50/50">
+              <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center mx-auto mb-4 shadow-sm text-gray-300">
+                <Monitor className="w-8 h-8" />
+              </div>
+              <h3 className="text-lg font-black text-navy-900 mb-1">No Active Repairs</h3>
+              <p className="text-gray-400 text-sm font-medium">Any new repair requests will appear here.</p>
+            </div>
+          }
+          columns={[
+            {
+              header: "Device",
+              render: (req) => (
+                <div className="flex items-center gap-4">
+                  <div className={`w-12 h-12 rounded-xl flex items-center justify-center shadow-lg ${
+                    req.device === "Mobile" ? "bg-navy-900 text-lime-400" : "bg-lime-500 text-navy-900"
+                  }`}>
+                    {req.device === "Mobile" ? <Smartphone className="w-6 h-6" /> : <Laptop className="w-6 h-6" />}
                   </div>
-                  <div className="min-w-0">
-                    <div className="flex items-center gap-2 mb-2">
-                      <h3 className="font-black text-xl text-navy-900 truncate">
-                        {req.brand} {req.model}
-                      </h3>
-                    </div>
-                    <div className="flex items-center gap-2 mb-3">
-                      <span className="bg-gray-100 text-gray-500 px-2 py-1 rounded-md text-[10px] font-black uppercase tracking-wider shrink-0">
-                        #{req.id}
-                      </span>
-                      <p className="text-gray-500 font-medium text-sm truncate">
-                        {req.issue}
-                      </p>
-                    </div>
-                    <div className="flex items-center gap-3">
-                      <span
-                        className={`px-3 py-1 rounded-full text-[10px] font-bold border flex items-center gap-2 ${statusColors[req.status]}`}
-                      >
-                        <span className="w-1.5 h-1.5 rounded-full bg-current animate-pulse"></span>
-                        {req.status}
-                      </span>
-                    </div>
+                  <div>
+                    <div className="font-bold text-navy-900">{req.brand} {req.model}</div>
+                    <div className="text-xs text-gray-400 font-medium tracking-wide">#{req.id}</div>
                   </div>
                 </div>
-
-                <div className="flex-1 bg-gray-50 p-6 rounded-2xl border border-gray-100 w-full">
-                  <div className="flex justify-between text-[10px] text-gray-400 mb-3 font-black uppercase tracking-widest">
-                    <span>Progress</span>
-                    <span>{Math.round(getProgress(req.status))}%</span>
-                  </div>
-                  <div className="w-full bg-gray-200 h-2 rounded-full overflow-hidden">
-                    <div
-                      className={`h-full transition-all duration-1000 relative ${req.status === "Rejected" ? "bg-red-500" : "bg-lime-500"}`}
-                      style={{ width: `${getProgress(req.status)}%` }}
-                    >
-                      <div className="absolute right-0 top-0 h-full w-2 bg-white/50 blur-[1px]"></div>
-                    </div>
-                  </div>
-                  {req.vendor && (
-                    <div className="mt-4 flex items-center gap-2 pt-4 border-t border-gray-200">
-                      <div className="w-6 h-6 rounded-full bg-navy-900 text-white flex items-center justify-center text-[10px] font-bold">
-                        T
-                      </div>
-                      <div className="text-xs text-navy-900 font-bold">
-                        Tech: {req.vendor}
-                      </div>
-                    </div>
-                  )}
+              )
+            },
+            {
+              header: "Issue",
+              render: (req) => (
+                <div className="max-w-[200px] truncate font-medium text-gray-600" title={req.issue}>
+                  {req.issue}
                 </div>
-
-                <div className="flex flex-row md:flex-col gap-3">
+              )
+            },
+            {
+              header: "Status",
+              render: (req) => (
+                <span className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-wider border ${statusColors[req.status]}`}>
+                   <span className="w-1.5 h-1.5 rounded-full bg-current animate-pulse"></span>
+                   {req.status}
+                </span>
+              )
+            },
+            {
+              header: "Date",
+              accessor: "date",
+              className: "text-sm font-bold text-gray-600"
+            },
+            {
+              header: "Actions",
+              headerClassName: "text-right",
+              className: "text-right",
+              render: (req) => (
+                <div className="flex items-center justify-end gap-2">
+                   <button
+                    onClick={(e) => { e.stopPropagation(); setSelectedRepair(req); }}
+                    className="p-2 text-gray-300 hover:text-navy-900 transition-colors"
+                  >
+                    <Eye className="w-5 h-5" />
+                  </button>
                   <button
-                    onClick={async () => {
-                      if (await confirm("Delete Repair?", "Are you sure you want to delete this repair request? This action cannot be undone.")) {
+                    onClick={async (e) => {
+                      e.stopPropagation();
+                      if (await confirm("Delete Repair?", "Are you sure you want to delete this repair request?")) {
                         deleteRepair(req.id);
                       }
                     }}
-                    className="flex-1 md:flex-none p-4 bg-white border border-gray-100 rounded-xl text-gray-400 hover:text-red-500 hover:border-red-100 hover:bg-red-50 transition-all shadow-sm"
+                    className="p-2 text-gray-300 hover:text-red-500 transition-colors"
                   >
-                    <X className="w-5 h-5 mx-auto" />
-                  </button>
-                  <button
-                    onClick={() => setSelectedRepair(req)}
-                    className="flex-[3] md:flex-none py-4 px-6 bg-navy-900 text-white font-bold rounded-xl hover:bg-navy-800 transition-all shadow-xl shadow-navy-900/10 text-xs uppercase tracking-wider"
-                  >
-                    Details
+                    <Trash2 className="w-5 h-5" />
                   </button>
                 </div>
-              </div>
-            </div>
-          ))}
-        </div>
+              )
+            }
+          ]}
+        />
       </div>
 
       {/* Repair Detail Modal */}

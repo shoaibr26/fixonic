@@ -16,15 +16,19 @@ const getToken = () => {
 export const DataProvider = ({ children }) => {
   // Blog CRUD
   const [blogs, setBlogs] = useState([]);
+  const [blogMeta, setBlogMeta] = useState({ page: 1, pages: 1, total: 0 });
   const [loadingBlogs, setLoadingBlogs] = useState(true);
 
-  const fetchBlogs = useCallback(async () => {
+  const fetchBlogs = useCallback(async (params = {}) => {
+    const { page = 1, limit = 5, search = "" } = params;
     setLoadingBlogs(true);
     try {
-      const response = await fetch(`${API_URL}/blogs`);
+      const query = new URLSearchParams({ page, limit, search }).toString();
+      const response = await fetch(`${API_URL}/blogs?${query}`);
       const data = await response.json();
       if (response.ok) {
-        setBlogs(data);
+        setBlogs(data.blogs);
+        setBlogMeta({ page: data.page, pages: data.pages, total: data.total });
       }
     } catch (error) {
       console.error("Error fetching blogs:", error);
@@ -109,15 +113,19 @@ export const DataProvider = ({ children }) => {
   // Review Moderation
   // Review Moderation
   const [reviews, setReviews] = useState([]);
+  const [reviewMeta, setReviewMeta] = useState({ page: 1, pages: 1, total: 0 });
   const [loadingReviews, setLoadingReviews] = useState(true);
 
-  const fetchReviews = useCallback(async () => {
+  const fetchReviews = useCallback(async (params = {}) => {
+    const { page = 1, limit = 5, search = "" } = params;
     setLoadingReviews(true);
     try {
-      const response = await fetch(`${API_URL}/reviews`);
+      const query = new URLSearchParams({ page, limit, search }).toString();
+      const response = await fetch(`${API_URL}/reviews?${query}`);
       const data = await response.json();
       if (response.ok) {
-        setReviews(data);
+        setReviews(data.reviews);
+        setReviewMeta({ page: data.page, pages: data.pages, total: data.total });
       }
     } catch (error) {
       console.error("Error fetching reviews:", error);
@@ -199,20 +207,24 @@ export const DataProvider = ({ children }) => {
 
   // User Management
   const [users, setUsers] = useState([]);
+  const [userMeta, setUserMeta] = useState({ page: 1, pages: 1, total: 0 });
 
-  const fetchUsers = useCallback(async () => {
+  const fetchUsers = useCallback(async (params = {}) => {
+    const { page = 1, limit = 5, search = "" } = params;
     try {
       const token = getToken();
       if (!token) return;
 
-      const response = await fetch(`${API_URL}/auth/users`, {
+      const query = new URLSearchParams({ page, limit, search }).toString();
+      const response = await fetch(`${API_URL}/auth/users?${query}`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
       });
       const data = await response.json();
       if (response.ok) {
-        setUsers(data);
+        setUsers(data.users);
+        setUserMeta({ page: data.page, pages: data.pages, total: data.total });
       }
     } catch (error) {
       console.error("Error fetching users:", error);
@@ -264,20 +276,24 @@ export const DataProvider = ({ children }) => {
 
   // Contact Management
   const [contacts, setContacts] = useState([]);
+  const [contactMeta, setContactMeta] = useState({ page: 1, pages: 1, total: 0 });
 
-  const fetchContacts = useCallback(async () => {
+  const fetchContacts = useCallback(async (params = {}) => {
+    const { page = 1, limit = 5, search = "" } = params;
     try {
       const token = getToken();
       if (!token) return;
 
-      const response = await fetch(`${API_URL}/contact`, {
+      const query = new URLSearchParams({ page, limit, search }).toString();
+      const response = await fetch(`${API_URL}/contact?${query}`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
       });
       const data = await response.json();
       if (response.ok) {
-        setContacts(data);
+        setContacts(data.contacts);
+        setContactMeta({ page: data.page, pages: data.pages, total: data.total });
       }
     } catch (error) {
       console.error("Error fetching contacts:", error);
@@ -364,47 +380,207 @@ export const DataProvider = ({ children }) => {
     }
   };
 
-  const [repairs, setRepairs] = useState(DUMMY_REPAIRS);
+  // Repair Management
+  const [repairs, setRepairs] = useState([]);
+  const [repairMeta, setRepairMeta] = useState({ page: 1, pages: 1, total: 0 });
+  const [loadingRepairs, setLoadingRepairs] = useState(true);
+
+  const fetchRepairs = useCallback(async (params = {}) => {
+    const { page = 1, limit = 5, search = "", status = "All" } = params;
+    setLoadingRepairs(true);
+    try {
+      const token = getToken();
+      if (!token) return;
+      const query = new URLSearchParams({ page, limit, search, status }).toString();
+      const response = await fetch(`${API_URL}/repairs?${query}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      const data = await response.json();
+      if (response.ok) {
+        setRepairs(data.repairs);
+        setRepairMeta({ page: data.page, pages: data.pages, total: data.total });
+      }
+    } catch (error) {
+      console.error("Error fetching repairs:", error);
+    } finally {
+      setLoadingRepairs(false);
+    }
+  }, []);
+
+  const addRepair = async (repairData) => {
+    try {
+      const token = getToken();
+      const response = await fetch(`${API_URL}/repairs`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(repairData),
+      });
+
+      const data = await response.json();
+      if (response.ok) {
+        setRepairs([data, ...repairs]);
+        return { success: true };
+      } else {
+        return { success: false, message: data.message };
+      }
+    } catch (error) {
+      console.error("Error adding repair:", error);
+      return { success: false, message: error.message };
+    }
+  };
+
+  const updateRepairStatus = async (id, newStatus) => {
+    try {
+      const token = getToken();
+      const response = await fetch(`${API_URL}/repairs/${id}/status`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ status: newStatus }),
+      });
+
+      const data = await response.json();
+      if (response.ok) {
+        setRepairs(
+          repairs.map((r) => (r.id === id ? data : r))
+        );
+        return { success: true };
+      }
+    } catch (error) {
+       console.error("Error updating repair:", error);
+       return { success: false, message: error.message };
+    }
+  };
+
+  const deleteRepair = async (id) => {
+    try {
+      const token = getToken();
+      const response = await fetch(`${API_URL}/repairs/${id}`, {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (response.ok) {
+        setRepairs(repairs.filter((r) => r.id !== id));
+        return { success: true };
+      }
+    } catch (error) {
+      console.error("Error deleting repair:", error);
+      return { success: false, message: error.message };
+    }
+  };
+
+  // Brands Management
+  const [brands, setBrands] = useState([]);
+  const [brandMeta, setBrandMeta] = useState({ page: 1, pages: 1, total: 0 });
   
-  const addRepair = (repair) => {
-    setRepairs([repair, ...repairs]);
+  const fetchBrands = useCallback(async (params = {}) => {
+    const { page = 1, limit = 5, search = "" } = params;
+    try {
+      const query = new URLSearchParams({ page, limit, search }).toString();
+      const response = await fetch(`${API_URL}/brands?${query}`);
+      const data = await response.json();
+      if (response.ok) {
+        setBrands(data.brands);
+        setBrandMeta({ page: data.page, pages: data.pages, total: data.total });
+      }
+    } catch (error) {
+      console.error("Error fetching brands:", error);
+    }
+  }, []);
+
+  const addBrand = async (brandData) => {
+    try {
+      const token = getToken();
+      const response = await fetch(`${API_URL}/brands`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(brandData),
+      });
+
+      const data = await response.json();
+      if (response.ok) {
+        setBrands([...brands, data]);
+        return { success: true };
+      } else {
+         return { success: false, message: data.message };
+      }
+    } catch (error) {
+      console.error("Error adding brand:", error);
+      return { success: false, message: error.message };
+    }
   };
 
-  const updateRepairStatus = (id, newStatus) => {
-    setRepairs(
-      repairs.map((r) => (r.id === id ? { ...r, status: newStatus } : r)),
-    );
-  };
+  const deleteBrand = async (id) => {
+    try {
+      const token = getToken();
+      const response = await fetch(`${API_URL}/brands/${id}`, {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
 
-  const deleteRepair = (id) => {
-    setRepairs(repairs.filter((r) => r.id !== id));
-    return { success: true };
+      if (response.ok) {
+        setBrands(brands.filter((b) => b._id !== id));
+        return { success: true };
+      } else {
+        return { success: false, message: "Failed to delete" };
+      }
+    } catch (error) {
+      console.error("Error deleting brand:", error);
+      return { success: false, message: error.message };
+    }
   };
 
   return (
     <DataContext.Provider
       value={{
         blogs,
+        blogMeta,
         loadingBlogs,
         fetchBlogs,
         addBlog,
         updateBlog: updateBlogData,
         deleteBlog,
         reviews,
+        reviewMeta,
         loadingReviews,
         fetchReviews,
         addReview,
         updateReview,
         deleteReview,
         users,
+        userMeta,
         updateUser,
         deleteUser,
         fetchUsers,
         repairs,
+        repairMeta,
+        loadingRepairs,
+        fetchRepairs,
         addRepair,
         updateRepairStatus,
         deleteRepair,
+        brands,
+        brandMeta,
+        fetchBrands,
+        addBrand,
+        deleteBrand,
         contacts,
+        contactMeta,
         fetchContacts,
         submitContact,
         deleteContactMessage,

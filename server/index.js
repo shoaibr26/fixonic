@@ -8,6 +8,8 @@ import contactRoutes from './routes/contactRoutes.js'; // Import contact form ro
 import blogRoutes from './routes/blogRoutes.js'; // Import blog routes
 import reviewRoutes from './routes/reviewRoutes.js'; // Import review routes
 import contentRoutes from './routes/contentRoutes.js'; // Import content routes
+import brandRoutes from './routes/brandRoutes.js';
+import repairRoutes from './routes/repairRoutes.js';
 
 dotenv.config(); // Initialize environment variables from .env file
 
@@ -63,6 +65,8 @@ app.use('/api/contact', contactRoutes); // Register contact routes under /api/co
 app.use('/api/blogs', blogRoutes); // Register blog routes under /api/blogs
 app.use('/api/reviews', reviewRoutes); // Register review routes under /api/reviews
 app.use('/api/content', contentRoutes); // Register content routes under /api/content
+app.use('/api/brands', brandRoutes);
+app.use('/api/repairs', repairRoutes);
 
 // Define the root route to verify the server is running
 app.get('/', (req, res) => { // Handle GET requests to the root URL

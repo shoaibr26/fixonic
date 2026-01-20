@@ -73,8 +73,35 @@ export const loginUser = async (req, res) => {
 // @access  Private/Admin
 export const getUsers = async (req, res) => {
   try {
-    const users = await User.find({});
-    res.json(users);
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 5;
+    const search = req.query.search || '';
+
+    let query = {};
+    // If the requesting user is not an admin, only return vendors
+    if (req.user && req.user.role !== 'admin') {
+      query = { role: 'vendor' };
+    }
+
+    if (search) {
+      query.$or = [
+        { name: { $regex: search, $options: 'i' } },
+        { email: { $regex: search, $options: 'i' } }
+      ];
+    }
+
+    const count = await User.countDocuments(query);
+    const users = await User.find(query)
+      .limit(limit)
+      .skip(limit * (page - 1))
+      .sort({ createdAt: -1 });
+
+    res.json({
+      users,
+      page,
+      pages: Math.ceil(count / limit),
+      total: count
+    });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }

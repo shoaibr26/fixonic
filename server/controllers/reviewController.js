@@ -5,8 +5,30 @@ import Review from '../models/Review.js';
 // @route   GET /api/reviews
 // @access  Public
 const getReviews = asyncHandler(async (req, res) => {
-  const reviews = await Review.find({});
-  res.json(reviews);
+  const page = parseInt(req.query.page) || 1;
+  const limit = parseInt(req.query.limit) || 5;
+  const search = req.query.search || '';
+
+  let query = {};
+  if (search) {
+    query.$or = [
+      { name: { $regex: search, $options: 'i' } },
+      { text: { $regex: search, $options: 'i' } }
+    ];
+  }
+
+  const count = await Review.countDocuments(query);
+  const reviews = await Review.find(query)
+    .limit(limit)
+    .skip(limit * (page - 1))
+    .sort({ createdAt: -1 });
+
+  res.json({
+    reviews,
+    page,
+    pages: Math.ceil(count / limit),
+    total: count
+  });
 });
 
 // @desc    Create a review

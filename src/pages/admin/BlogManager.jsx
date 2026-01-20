@@ -1,20 +1,23 @@
 import { useState, useEffect } from 'react';
-import { Plus, Edit, Trash2, Image as ImageIcon } from 'lucide-react';
+import { Plus, Edit, Trash2, Image as ImageIcon, Search } from 'lucide-react';
 import { useData } from '../../context/DataContext';
 import { useToast } from '../../context/ToastContext';
 import { useConfirm } from '../../context/ConfirmContext';
 import Modal from '../../components/Modal';
+import Table from '../../components/Table';
 
 const BlogManager = () => {
-  const { blogs, addBlog, updateBlog, deleteBlog, fetchBlogs } = useData();
+  const { blogs, blogMeta, addBlog, updateBlog, deleteBlog, fetchBlogs } = useData();
   const { showToast } = useToast();
   const { confirm } = useConfirm();
   const [showBlogModal, setShowBlogModal] = useState(false);
   const [editingBlog, setEditingBlog] = useState(null);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
 
   useEffect(() => {
-    fetchBlogs();
-  }, [fetchBlogs]);
+    fetchBlogs({ page: currentPage, search: searchTerm });
+  }, [fetchBlogs, currentPage, searchTerm]);
 
   const handleBlogSubmit = async (e) => {
     e.preventDefault();
@@ -71,53 +74,73 @@ const BlogManager = () => {
           </button>
       </div>
 
-      <div className="bg-white rounded-3xl border border-gray-100 shadow-sm overflow-hidden">
-        <table className="w-full text-left">
-          <thead className="bg-gray-50/50">
-            <tr className="text-gray-400 text-xs font-black uppercase tracking-widest border-b border-gray-50">
-              <th className="px-8 py-4">Blog Post</th>
-              <th className="px-8 py-4">Category</th>
-              <th className="px-8 py-4">Date</th>
-              <th className="px-8 py-4">Action</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-gray-50">
-            {blogs.map((blog) => (
-              <tr key={blog._id}>
-                <td className="px-8 py-6">
-                   <div className="flex items-center gap-4">
-                     <img src={blog.image} className="w-16 h-16 rounded-2xl object-cover" alt="" />
-                     <h3 className="font-bold text-gray-900 text-sm leading-tight max-w-xs">{blog.title}</h3>
-                   </div>
-                </td>
-                <td className="px-8 py-6">
-                   <span className="text-[10px] font-black text-secondary-600 uppercase tracking-widest">{blog.category}</span>
-                </td>
-                <td className="px-8 py-6 text-sm text-gray-500 font-bold">{blog.date}</td>
-                <td className="px-8 py-6 flex gap-2">
-                  <button 
-                    onClick={() => { setEditingBlog(blog); setShowBlogModal(true); }}
-                    className="p-2 text-gray-300 hover:text-navy-600"
-                  >
-                    <Edit className="w-5 h-5" />
-                  </button>
-                  <button 
-                    onClick={() => handleDelete(blog._id)}
-                    className="p-2 text-gray-300 hover:text-red-600"
-                  >
-                    <Trash2 className="w-5 h-5" />
-                  </button>
-                </td>
-              </tr>
-            ))}
-            {blogs.length === 0 && (
-              <tr>
-                <td colSpan="4" className="px-8 py-20 text-center text-gray-400">No blog posts found.</td>
-              </tr>
-            )}
-          </tbody>
-        </table>
+      <div className="relative">
+        <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+        <input
+          type="text"
+          placeholder="Search blogs..."
+          className="w-full pl-12 pr-4 py-4 bg-white border border-gray-100 rounded-2xl focus:ring-navy-500 focus:border-navy-500 transition-all font-bold text-sm shadow-sm"
+          value={searchTerm}
+          onChange={(e) => {
+            setSearchTerm(e.target.value);
+            setCurrentPage(1);
+          }}
+        />
       </div>
+
+      <Table
+        data={blogs}
+        pagination={{
+            page: blogMeta.page,
+            pages: blogMeta.pages,
+            total: blogMeta.total,
+            onPageChange: (newPage) => setCurrentPage(newPage)
+        }}
+        columns={[
+          {
+            header: "Blog Post",
+            render: (blog) => (
+               <div className="flex items-center gap-4">
+                 <img src={blog.image} className="w-16 h-16 rounded-2xl object-cover" alt="" />
+                 <h3 className="font-bold text-gray-900 text-sm leading-tight max-w-xs">{blog.title}</h3>
+               </div>
+            )
+          },
+          {
+            header: "Category",
+            render: (blog) => (
+              <span className="text-[10px] font-black text-secondary-600 uppercase tracking-widest">{blog.category}</span>
+            )
+          },
+          {
+            header: "Date",
+            accessor: "date",
+            className: "text-sm text-gray-500 font-bold"
+          },
+          {
+            header: "Action",
+            render: (blog) => (
+              <div className="flex gap-2">
+                <button 
+                  onClick={() => { setEditingBlog(blog); setShowBlogModal(true); }}
+                  className="p-2 text-gray-300 hover:text-navy-600"
+                >
+                  <Edit className="w-5 h-5" />
+                </button>
+                <button 
+                  onClick={() => handleDelete(blog._id)}
+                  className="p-2 text-gray-300 hover:text-red-600"
+                >
+                  <Trash2 className="w-5 h-5" />
+                </button>
+              </div>
+            )
+          }
+        ]}
+        emptyState={
+          <div className="text-center py-20 text-gray-400">No blog posts found.</div>
+        }
+      />
 
       {/* Blog Modal */}
       <Modal

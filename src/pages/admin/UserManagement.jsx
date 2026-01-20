@@ -1,16 +1,23 @@
-import { useState } from 'react';
-import { Edit, Trash2 } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { Edit, Trash2, Search } from 'lucide-react';
 import { useData } from '../../context/DataContext';
 import { useToast } from '../../context/ToastContext';
 import { useConfirm } from '../../context/ConfirmContext';
 import Modal from '../../components/Modal';
+import Table from '../../components/Table';
 
 const UserManagement = () => {
-  const { users, updateUser, deleteUser } = useData();
+  const { users, userMeta, fetchUsers, updateUser, deleteUser } = useData();
   const { showToast } = useToast();
   const { confirm } = useConfirm();
   const [showUserModal, setShowUserModal] = useState(false);
   const [editingUser, setEditingUser] = useState(null);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+
+  useEffect(() => {
+    fetchUsers({ page: currentPage, search: searchTerm });
+  }, [fetchUsers, currentPage, searchTerm]);
 
   const handleUserSubmit = async (e) => {
     e.preventDefault();
@@ -54,54 +61,75 @@ const UserManagement = () => {
         <h2 className="text-2xl font-black text-gray-900">User Management</h2>
         <p className="text-gray-500">View and manage registered users.</p>
       </div>
-      <div className="bg-white rounded-3xl border border-gray-100 shadow-sm overflow-hidden">
-        <table className="w-full text-left">
-          <thead className="bg-gray-50/50">
-            <tr className="text-gray-400 text-xs font-black uppercase tracking-widest border-b border-gray-50">
-              <th className="px-8 py-4">User</th>
-              <th className="px-8 py-4">Role</th>
-              <th className="px-8 py-4">Email</th>
-              <th className="px-8 py-4">Action</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-gray-50">
-            {users.map((user) => (
-              <tr key={user._id}>
-                <td className="px-8 py-6 font-bold text-gray-900">{user.name}</td>
-                <td className="px-8 py-6">
-                  <span className={`px-3 py-1 rounded-lg text-xs font-black uppercase tracking-wider ${
-                    user.role === 'admin' ? 'bg-purple-100 text-purple-600' :
-                    user.role === 'vendor' ? 'bg-orange-100 text-orange-600' :
-                    'bg-blue-100 text-blue-600'
-                  }`}>
-                    {user.role}
-                  </span>
-                </td>
-                <td className="px-8 py-6 text-sm text-gray-500">{user.email}</td>
-                <td className="px-8 py-6 flex gap-2">
-                  <button 
-                    onClick={() => { setEditingUser(user); setShowUserModal(true); }}
-                    className="p-2 text-gray-300 hover:text-navy-600"
-                  >
-                    <Edit className="w-5 h-5" />
-                  </button>
-                  <button 
-                    onClick={() => handleDelete(user._id)}
-                    className="p-2 text-gray-300 hover:text-red-600"
-                  >
-                    <Trash2 className="w-5 h-5" />
-                  </button>
-                </td>
-              </tr>
-            ))}
-            {users.length === 0 && (
-              <tr>
-                <td colSpan="4" className="px-8 py-20 text-center text-gray-400">No users found.</td>
-              </tr>
-            )}
-          </tbody>
-        </table>
+      <div className="relative">
+        <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+        <input
+          type="text"
+          placeholder="Search users..."
+          className="w-full pl-12 pr-4 py-4 bg-white border border-gray-100 rounded-2xl focus:ring-navy-500 focus:border-navy-500 transition-all font-bold text-sm shadow-sm"
+          value={searchTerm}
+          onChange={(e) => {
+            setSearchTerm(e.target.value);
+            setCurrentPage(1);
+          }}
+        />
       </div>
+
+      <Table
+        data={users}
+        pagination={{
+            page: userMeta.page,
+            pages: userMeta.pages,
+            total: userMeta.total,
+            onPageChange: (newPage) => setCurrentPage(newPage)
+        }}
+        columns={[
+          {
+            header: "User",
+            accessor: "name",
+            className: "font-bold text-gray-900"
+          },
+          {
+            header: "Role",
+            render: (user) => (
+              <span className={`px-3 py-1 rounded-lg text-xs font-black uppercase tracking-wider ${
+                user.role === 'admin' ? 'bg-purple-100 text-purple-600' :
+                user.role === 'vendor' ? 'bg-orange-100 text-orange-600' :
+                'bg-blue-100 text-blue-600'
+              }`}>
+                {user.role}
+              </span>
+            )
+          },
+          {
+            header: "Email",
+            accessor: "email",
+            className: "text-sm text-gray-500"
+          },
+          {
+            header: "Action",
+            render: (user) => (
+              <div className="flex gap-2">
+                <button 
+                  onClick={() => { setEditingUser(user); setShowUserModal(true); }}
+                  className="p-2 text-gray-300 hover:text-navy-600"
+                >
+                  <Edit className="w-5 h-5" />
+                </button>
+                <button 
+                  onClick={() => handleDelete(user._id)}
+                  className="p-2 text-gray-300 hover:text-red-600"
+                >
+                  <Trash2 className="w-5 h-5" />
+                </button>
+              </div>
+            )
+          }
+        ]}
+        emptyState={
+          <div className="text-center py-20 text-gray-400">No users found.</div>
+        }
+      />
 
       {/* User Modal */}
       <Modal

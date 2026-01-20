@@ -15,7 +15,6 @@ import ProtectedRoute from "./components/ProtectedRoute";
 import Signin from "./pages/auth/Signin";
 import Signup from "./pages/auth/Signup";
 import Dashboard from "./pages/Dashboard";
-import ClientHistory from "./pages/client/ClientHistory";
 import LandingPage from "./pages/landing/LandingPage";
 import About from "./pages/About";
 import Services from "./pages/Services";
@@ -49,10 +48,6 @@ function App() {
                     {/* Protected Routes */}
                     <Route element={<ProtectedRoute />}>
                       <Route path="/dashboard" element={<Dashboard />} />
-                      <Route
-                        path="/client/history"
-                        element={<ClientHistory />}
-                      />
                     </Route>
 
                     {/* Unauthorized Page */}

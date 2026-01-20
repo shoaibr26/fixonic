@@ -1,20 +1,23 @@
 import { useState, useEffect } from 'react';
-import { Trash2, Plus, Edit, X, Star } from 'lucide-react';
+import { Trash2, Plus, Edit, X, Star, Search } from 'lucide-react';
 import Modal from '../../components/Modal';
+import Table from '../../components/Table';
 import { useData } from '../../context/DataContext';
 import { useToast } from '../../context/ToastContext';
 import { useConfirm } from '../../context/ConfirmContext';
 
 const ReviewModeration = () => {
-  const { reviews, addReview, updateReview, deleteReview, fetchReviews } = useData();
+  const { reviews, reviewMeta, addReview, updateReview, deleteReview, fetchReviews } = useData();
   const { showToast } = useToast();
   const { confirm } = useConfirm();
   const [showReviewModal, setShowReviewModal] = useState(false);
   const [editingReview, setEditingReview] = useState(null);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
 
   useEffect(() => {
-    fetchReviews();
-  }, [fetchReviews]);
+    fetchReviews({ page: currentPage, search: searchTerm });
+  }, [fetchReviews, currentPage, searchTerm]);
 
   const handleReviewSubmit = async (e) => {
     e.preventDefault();
@@ -69,46 +72,70 @@ const ReviewModeration = () => {
             <Plus className="w-5 h-5" /> New Review
           </button>
       </div>
-      <div className="bg-white rounded-3xl border border-gray-100 shadow-sm overflow-hidden">
-        <table className="w-full text-left">
-          <thead className="bg-gray-50/50">
-            <tr className="text-gray-400 text-xs font-black uppercase tracking-widest border-b border-gray-50">
-              <th className="px-8 py-4">Client</th>
-              <th className="px-8 py-4">Comment</th>
-              <th className="px-8 py-4">Rating</th>
-              <th className="px-8 py-4">Action</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-gray-50">
-            {reviews.map((rev) => (
-              <tr key={rev._id}>
-                <td className="px-8 py-6 font-bold text-gray-900">{rev.name}</td>
-                <td className="px-8 py-6 text-sm text-gray-600 italic">"{rev.text}"</td>
-                <td className="px-8 py-6 text-amber-500 font-bold">★ {rev.stars}</td>
-                <td className="px-8 py-6 flex gap-2">
-                  <button 
-                    onClick={() => { setEditingReview(rev); setShowReviewModal(true); }}
-                    className="p-2 text-gray-300 hover:text-navy-600"
-                  >
-                    <Edit className="w-5 h-5" />
-                  </button>
-                  <button 
-                    onClick={() => handleDelete(rev._id)}
-                    className="p-2 text-gray-300 hover:text-red-600"
-                  >
-                    <Trash2 className="w-5 h-5" />
-                  </button>
-                </td>
-              </tr>
-            ))}
-            {reviews.length === 0 && (
-              <tr>
-                <td colSpan="4" className="px-8 py-20 text-center text-gray-400">No reviews found.</td>
-              </tr>
-            )}
-          </tbody>
-        </table>
+      <div className="relative">
+        <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+        <input
+          type="text"
+          placeholder="Search reviews..."
+          className="w-full pl-12 pr-4 py-4 bg-white border border-gray-100 rounded-2xl focus:ring-navy-500 focus:border-navy-500 transition-all font-bold text-sm shadow-sm"
+          value={searchTerm}
+          onChange={(e) => {
+            setSearchTerm(e.target.value);
+            setCurrentPage(1);
+          }}
+        />
       </div>
+
+      <Table
+        data={reviews}
+        pagination={{
+            page: reviewMeta.page,
+            pages: reviewMeta.pages,
+            total: reviewMeta.total,
+            onPageChange: (newPage) => setCurrentPage(newPage)
+        }}
+        columns={[
+          {
+            header: "Client",
+            accessor: "name",
+            className: "font-bold text-gray-900"
+          },
+          {
+            header: "Comment",
+            render: (rev) => (
+              <span className="text-sm text-gray-600 italic">"{rev.text}"</span>
+            )
+          },
+          {
+            header: "Rating",
+            render: (rev) => (
+              <span className="text-amber-500 font-bold">★ {rev.stars}</span>
+            )
+          },
+          {
+            header: "Action",
+            render: (rev) => (
+              <div className="flex gap-2">
+                <button 
+                  onClick={() => { setEditingReview(rev); setShowReviewModal(true); }}
+                  className="p-2 text-gray-300 hover:text-navy-600"
+                >
+                  <Edit className="w-5 h-5" />
+                </button>
+                <button 
+                  onClick={() => handleDelete(rev._id)}
+                  className="p-2 text-gray-300 hover:text-red-600"
+                >
+                  <Trash2 className="w-5 h-5" />
+                </button>
+              </div>
+            )
+          }
+        ]}
+        emptyState={
+          <div className="text-center py-20 text-gray-400">No reviews found.</div>
+        }
+      />
 
        {/* Review Modal */}
       <Modal

@@ -1,19 +1,13 @@
 import { useState, useEffect } from 'react';
 import { useData } from '../../context/DataContext';
-import { useAuth } from '../../context/AuthContext';
 import {
   Users,
   FileText,
   MessageSquare,
   LayoutDashboard,
-  LogOut,
-  Bell,
-  Search,
-  Settings,
-  Menu,
-  X,
   Inbox as InboxIcon,
-  Type // Icon for Content Manager
+  Monitor,
+  Type
 } from 'lucide-react';
 import Overview from './Overview';
 import UserManagement from './UserManagement';
@@ -21,12 +15,11 @@ import BlogManager from './BlogManager';
 import ReviewModeration from './ReviewModeration';
 import ContentManager from './ContentManager';
 import Inbox from './Inbox';
+import BrandManager from './BrandManager';
 
 const AdminDashboard = () => {
   const { fetchUsers, fetchContacts } = useData();
   const [activeTab, setActiveTab] = useState('overview');
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const { logout, user } = useAuth();
 
   useEffect(() => {
     fetchUsers();
@@ -39,7 +32,8 @@ const AdminDashboard = () => {
     { id: 'blogs', label: 'Blogs', icon: <FileText className="w-5 h-5" /> },
     { id: 'reviews', label: 'Reviews', icon: <MessageSquare className="w-5 h-5" /> },
     { id: 'inbox', label: 'Inbox', icon: <InboxIcon className="w-5 h-5" /> },
-    { id: 'content', label: 'Content', icon: <Type className="w-5 h-5" /> }, // New Menu Item
+    { id: 'brands', label: 'Brands', icon: <Monitor className="w-5 h-5" /> },
+    { id: 'content', label: 'Content', icon: <Type className="w-5 h-5" /> },
   ];
 
   const renderContent = () => {
@@ -52,8 +46,10 @@ const AdminDashboard = () => {
         return <ReviewModeration />;
       case 'inbox':
         return <Inbox />;
+      case 'brands':
+        return <BrandManager />;
       case 'content':
-        return <ContentManager />; // New Case
+        return <ContentManager />;
       case 'overview':
       default:
         return <Overview />;

@@ -5,8 +5,31 @@ import Blog from '../models/Blog.js';
 // @route   GET /api/blogs
 // @access  Public
 const getBlogs = asyncHandler(async (req, res) => {
-  const blogs = await Blog.find({});
-  res.json(blogs);
+  const page = parseInt(req.query.page) || 1;
+  const limit = parseInt(req.query.limit) || 5;
+  const search = req.query.search || '';
+
+  let query = {};
+  if (search) {
+    query.$or = [
+      { title: { $regex: search, $options: 'i' } },
+      { category: { $regex: search, $options: 'i' } },
+      { content: { $regex: search, $options: 'i' } }
+    ];
+  }
+
+  const count = await Blog.countDocuments(query);
+  const blogs = await Blog.find(query)
+    .limit(limit)
+    .skip(limit * (page - 1))
+    .sort({ createdAt: -1 });
+
+  res.json({
+    blogs,
+    page,
+    pages: Math.ceil(count / limit),
+    total: count
+  });
 });
 
 // @desc    Fetch single blog

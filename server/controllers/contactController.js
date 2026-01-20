@@ -25,8 +25,32 @@ export const createContact = async (req, res) => {
 // @access  Private/Admin
 export const getContacts = async (req, res) => {
   try {
-    const contacts = await Contact.find().sort({ createdAt: -1 });
-    res.json(contacts);
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 5;
+    const search = req.query.search || '';
+
+    let query = {};
+    if (search) {
+      query.$or = [
+        { name: { $regex: search, $options: 'i' } },
+        { email: { $regex: search, $options: 'i' } },
+        { subject: { $regex: search, $options: 'i' } },
+        { message: { $regex: search, $options: 'i' } }
+      ];
+    }
+
+    const count = await Contact.countDocuments(query);
+    const contacts = await Contact.find(query)
+      .limit(limit)
+      .skip(limit * (page - 1))
+      .sort({ createdAt: -1 });
+
+    res.json({
+      contacts,
+      page,
+      pages: Math.ceil(count / limit),
+      total: count
+    });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
