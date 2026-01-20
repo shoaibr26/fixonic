@@ -15,7 +15,11 @@ connectDB(); // Establish connection to the database
 
 const app = express(); // Initialize the Express application
 
-app.use(cors()); // Enable Cross-Origin Resource Sharing (CORS) middleware
+app.use(cors({
+  origin: process.env.FRONTEND_URL,
+  methods: ["GET", "POST", "PUT", "DELETE"],
+  credentials: true
+})); // Enable Cross-Origin Resource Sharing (CORS) middleware
 app.use(express.json()); // Enable middleware to parse JSON request bodies
 
 app.use('/api/auth', authRoutes); // Register authentication routes under /api/auth
