@@ -26,7 +26,7 @@ app.use('/api/content', contentRoutes); // Register content routes under /api/co
 
 // Define the root route to verify the server is running
 app.get('/', (req, res) => { // Handle GET requests to the root URL
-  res.send('API is running...'); // Send a simple response string
+  res.send('Backend is running successfully...'); // Send a simple response string
 }); // End of root route handler
 
 const PORT = process.env.PORT || 5000; // Define the port, defaulting to 5000 if not in env
