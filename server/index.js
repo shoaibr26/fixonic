@@ -1,5 +1,5 @@
 import express from 'express'; // Import Express web framework
-import configureSocket from './config/socket.js'; // Import custom Socket.IO configuration
+
 import dotenv from 'dotenv'; // Import dotenv to manage environment variables
 import cors from 'cors'; // Import CORS to allow cross-origin requests
 import connectDB from './config/db.js'; // Import database connection function
@@ -36,6 +36,6 @@ app.get('/', (req, res) => { // Handle GET requests to the root URL
 const PORT = process.env.PORT || 5000; // Define the port, defaulting to 5000 if not in env
 
 // Start the server and listen on the specified port, logging the status
-const server = app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
 
-configureSocket(server); // Initialize Socket.IO with the running server instance
+

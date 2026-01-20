@@ -1,5 +1,4 @@
 import { useState, useEffect, useRef } from "react";
-import { io } from "socket.io-client";
 import {
   MessageSquare,
   X,
@@ -10,10 +9,6 @@ import {
   Maximize2,
   Paperclip,
 } from "lucide-react";
-
-// Initialize socket outside component to avoid multiple connections
-// In a real app, you might want this in a context or custom hook
-const ENDPOINT = import.meta.env.VITE_API_BASE_URL.replace("/api", "");
 
 const ChatWidget = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -27,9 +22,6 @@ const ChatWidget = () => {
       timestamp: new Date().toISOString(),
     },
   ]);
-  const [isConnected, setIsConnected] = useState(false);
-  const socketRef = useRef(null);
-
   const messagesEndRef = useRef(null);
 
   const scrollToBottom = () => {
@@ -37,51 +29,33 @@ const ChatWidget = () => {
   };
 
   useEffect(() => {
-    // Connect to socket
-    const newSocket = io(ENDPOINT);
-    socketRef.current = newSocket;
-
-    newSocket.on("connect", () => {
-      setIsConnected(true);
-      newSocket.emit("join_room", "general-support"); // Simple room logic
-    });
-
-    newSocket.on("disconnect", () => {
-      setIsConnected(false);
-    });
-
-    newSocket.on("receive_message", (data) => {
-      setMessages((prev) => [
-        ...prev,
-        { ...data, sender: "support", id: Date.now() },
-      ]);
-    });
-
-    return () => {
-      newSocket.disconnect();
-    };
-  }, []);
-
-  useEffect(() => {
     scrollToBottom();
   }, [messages, isOpen]);
 
   const handleSendMessage = (e) => {
     e.preventDefault();
-    if (message.trim() && socketRef.current) {
+    if (message.trim()) {
       const messageData = {
         room: "general-support",
         text: message,
-        sender: "user", // "user" for local display logic
+        sender: "user",
         timestamp: new Date().toISOString(),
       };
 
-      // Emit to server
-      socketRef.current.emit("send_message", messageData);
-
-      // Add to local state
+      // Add user message to local state
       setMessages((prev) => [...prev, { ...messageData, id: Date.now() }]);
       setMessage("");
+
+      // Simulate dummy response
+      setTimeout(() => {
+        const dummyResponse = {
+          id: Date.now() + 1,
+          text: "Thanks for reaching out! This is a demo response. Our support team will get back to you shortly.",
+          sender: "support",
+          timestamp: new Date().toISOString(),
+        };
+        setMessages((prev) => [...prev, dummyResponse]);
+      }, 1000);
     }
   };
 
@@ -113,9 +87,7 @@ const ChatWidget = () => {
                 <User className="w-5 h-5 text-lime-400" />
               </div>
               <span
-                className={`absolute bottom-0 right-0 w-3 h-3 border-2 border-navy-500 rounded-full ${
-                  isConnected ? "bg-green-500" : "bg-red-500"
-                }`}
+                className="absolute bottom-0 right-0 w-3 h-3 border-2 border-navy-500 rounded-full bg-green-500"
               ></span>
             </div>
             <div>
@@ -123,7 +95,7 @@ const ChatWidget = () => {
                 Support Team
               </h3>
               <p className="text-navy-200 text-xs flex items-center gap-1">
-                {isConnected ? "We are online" : "Connecting..."}
+                We are online
               </p>
             </div>
           </div>
