@@ -202,14 +202,16 @@ const LandingPage = () => {
             blogs.slice(0, 2).map((blog) => (
               <div key={blog._id} className="group flex flex-col md:flex-row bg-white rounded-[2rem] overflow-hidden border border-gray-100 hover:border-lime-200 transition-all cursor-pointer">
                 <div className="md:w-2/5 h-64 md:h-auto relative overflow-hidden">
-                    <img src={blog.image} alt={blog.title} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
-                    <div className="absolute top-4 left-4 bg-white/90 backdrop-blur px-3 py-1 rounded-lg text-xs font-black text-navy-900 uppercase tracking-wider">
-                        {blog.category}
-                    </div>
+                  <img src={blog.image} alt={blog.title} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
+                  <div className="absolute top-4 left-4 bg-white/90 backdrop-blur px-3 py-1 rounded-lg text-xs font-black text-navy-900 uppercase tracking-wider">
+                    {blog.category}
+                  </div>
                 </div>
                 <div className="p-8 md:w-3/5 flex flex-col justify-center">
                   <div className="text-xs font-bold text-gray-400 mb-3">{blog.date}</div>
-                  <h3 className="text-2xl font-black text-navy-900 mb-4 leading-tight group-hover:text-lime-600 transition-colors">{blog.title}</h3>
+                  <h3 className="text-2xl font-black text-navy-900 mb-4 leading-tight group-hover:text-lime-600 transition-colors">
+                    <Link to={`/journals/${blog._id}`}>{blog.title}</Link>
+                  </h3>
                   <p className="text-gray-500 text-sm line-clamp-2 mb-6 font-medium leading-relaxed">{blog.content}</p>
                   <Link to={`/journals/${blog._id}`} className="text-navy-900 font-bold text-sm underline decoration-2 decoration-lime-500 underline-offset-4 group-hover:decoration-navy-900 transition-all">Read Article</Link>
                 </div>

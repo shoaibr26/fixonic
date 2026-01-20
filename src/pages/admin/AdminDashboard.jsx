@@ -7,7 +7,8 @@ import {
   LayoutDashboard,
   Inbox as InboxIcon,
   Monitor,
-  Type
+  Type,
+  Wrench
 } from 'lucide-react';
 import Overview from './Overview';
 import UserManagement from './UserManagement';
@@ -16,6 +17,7 @@ import ReviewModeration from './ReviewModeration';
 import ContentManager from './ContentManager';
 import Inbox from './Inbox';
 import BrandManager from './BrandManager';
+import RepairManager from './RepairManager';
 
 const AdminDashboard = () => {
   const { fetchUsers, fetchContacts } = useData();
@@ -33,6 +35,7 @@ const AdminDashboard = () => {
     { id: 'reviews', label: 'Reviews', icon: <MessageSquare className="w-5 h-5" /> },
     { id: 'inbox', label: 'Inbox', icon: <InboxIcon className="w-5 h-5" /> },
     { id: 'brands', label: 'Brands', icon: <Monitor className="w-5 h-5" /> },
+    { id: 'repairs', label: 'Repairs', icon: <Wrench className="w-5 h-5" /> },
     { id: 'content', label: 'Content', icon: <Type className="w-5 h-5" /> },
   ];
 
@@ -50,6 +53,8 @@ const AdminDashboard = () => {
         return <BrandManager />;
       case 'content':
         return <ContentManager />;
+      case 'repairs':
+        return <RepairManager />;
       case 'overview':
       default:
         return <Overview />;
@@ -67,11 +72,10 @@ const AdminDashboard = () => {
               <button
                 key={item.id}
                 onClick={() => setActiveTab(item.id)}
-                className={`w-full flex items-center gap-3 px-4 py-3 rounded-2xl font-black text-sm transition-all ${
-                  activeTab === item.id 
-                   ? 'bg-navy-500 text-white' 
-                   : 'text-navy-300 hover:bg-navy-50 hover:text-navy-900'
-                }`}
+                className={`w-full flex items-center gap-3 px-4 py-3 rounded-2xl font-black text-sm transition-all ${activeTab === item.id
+                    ? 'bg-navy-500 text-white'
+                    : 'text-navy-300 hover:bg-navy-50 hover:text-navy-900'
+                  }`}
               >
                 {item.icon}
                 {item.label}

@@ -111,42 +111,42 @@ export const SERVICE_CATEGORIES = [
       iconKey: 'smartphone',
       color: 'bg-lime-50 text-lime-600',
       features: ['Screen Replacement', 'Battery Swapping', 'Charging Port Fix', 'Camera Repair'],
-      price: 'Starting from $29'
+      price: 'Starting from ₨ 2,500'
     },
     {
       title: 'Laptop Repair',
       iconKey: 'laptop',
       color: 'bg-navy-50 text-navy-600',
       features: ['Keyboard Replacement', 'RAM/SSD Upgrade', 'Liquid Damage Fix', 'OS Installation'],
-      price: 'Starting from $59'
+      price: 'Starting from ₨ 5,000'
     },
     {
       title: 'Tablet Repair',
       iconKey: 'tablet',
       color: 'bg-purple-100 text-purple-600',
       features: ['Glass Replacement', 'Motherboard Repair', 'Software Decrypt', 'Button Fix'],
-      price: 'Starting from $45'
+      price: 'Starting from ₨ 3,500'
     },
     {
       title: 'Smartwatch',
       iconKey: 'watch',
       color: 'bg-amber-100 text-amber-600',
       features: ['Sensor Cleaning', 'Strap Replacement', 'Screen Repair', 'Battery Service'],
-      price: 'Starting from $35'
+      price: 'Starting from ₨ 2,000'
     },
     {
       title: 'Home Audio',
       iconKey: 'speaker',
       color: 'bg-green-100 text-green-600',
       features: ['Component Repair', 'Wiring Overhaul', 'Bluetooth Modules', 'Firmware Update'],
-      price: 'Starting from $65'
+      price: 'Starting from ₨ 4,000'
     },
     {
       title: 'Desktop/Monitors',
       iconKey: 'monitor',
       color: 'bg-red-100 text-red-600',
       features: ['Monitor Panel Fix', 'PC Dusting', 'Power Supply Repair', 'Cooling System'],
-      price: 'Starting from $49'
+      price: 'Starting from ₨ 4,500'
     }
 ];
 

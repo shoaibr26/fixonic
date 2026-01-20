@@ -79,7 +79,7 @@ export const DataProvider = ({ children }) => {
         setBlogs(blogs.map((b) => ((b._id || b.id) === (data._id || data.id) ? data : b)));
         return { success: true };
       } else {
-         return { success: false, message: data.message };
+        return { success: false, message: data.message };
       }
     } catch (error) {
       console.error("Error updating blog:", error);
@@ -101,8 +101,8 @@ export const DataProvider = ({ children }) => {
         setBlogs(blogs.filter((b) => (b._id || b.id) !== id));
         return { success: true };
       } else {
-         const data = await response.json();
-         return { success: false, message: data.message };
+        const data = await response.json();
+        return { success: false, message: data.message };
       }
     } catch (error) {
       console.error("Error deleting blog:", error);
@@ -135,50 +135,50 @@ export const DataProvider = ({ children }) => {
   }, []);
 
   const addReview = async (reviewData) => {
-      try {
-        const token = getToken();
-        const response = await fetch(`${API_URL}/reviews`, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                Authorization: `Bearer ${token}`,
-            },
-            body: JSON.stringify(reviewData),
-        });
-        const data = await response.json();
-        if (response.ok) {
-            setReviews([...reviews, data]);
-            return { success: true };
-        } else {
-            return { success: false, message: data.message };
-        }
-      } catch (error) {
-          console.error("Error adding review:", error);
-          return { success: false, message: error.message };
+    try {
+      const token = getToken();
+      const response = await fetch(`${API_URL}/reviews`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(reviewData),
+      });
+      const data = await response.json();
+      if (response.ok) {
+        setReviews([...reviews, data]);
+        return { success: true };
+      } else {
+        return { success: false, message: data.message };
       }
+    } catch (error) {
+      console.error("Error adding review:", error);
+      return { success: false, message: error.message };
+    }
   };
 
   const updateReview = async (updatedReview) => {
     try {
-        const token = getToken();
-        const response = await fetch(`${API_URL}/reviews/${updatedReview._id || updatedReview.id}`, {
-            method: "PUT",
-            headers: {
-                "Content-Type": "application/json",
-                Authorization: `Bearer ${token}`,
-            },
-            body: JSON.stringify(updatedReview),
-        });
-        const data = await response.json();
-        if (response.ok) {
-            setReviews(reviews.map((r) => ((r._id || r.id) === (data._id || data.id) ? data : r)));
-            return { success: true };
-        } else {
-             return { success: false, message: data.message };
-        }
+      const token = getToken();
+      const response = await fetch(`${API_URL}/reviews/${updatedReview._id || updatedReview.id}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(updatedReview),
+      });
+      const data = await response.json();
+      if (response.ok) {
+        setReviews(reviews.map((r) => ((r._id || r.id) === (data._id || data.id) ? data : r)));
+        return { success: true };
+      } else {
+        return { success: false, message: data.message };
+      }
     } catch (error) {
-        console.error("Error updating review:", error);
-        return { success: false, message: error.message };
+      console.error("Error updating review:", error);
+      return { success: false, message: error.message };
     }
   };
 
@@ -196,12 +196,12 @@ export const DataProvider = ({ children }) => {
         setReviews(reviews.filter((r) => (r._id || r.id) !== id));
         return { success: true };
       } else {
-          const data = await response.json();
-          return { success: false, message: data.message };
+        const data = await response.json();
+        return { success: false, message: data.message };
       }
     } catch (error) {
-       console.error("Error deleting review:", error);
-       return { success: false, message: error.message };
+      console.error("Error deleting review:", error);
+      return { success: false, message: error.message };
     }
   };
 
@@ -363,20 +363,20 @@ export const DataProvider = ({ children }) => {
       const response = await fetch(`${API_URL}/content/${pageName}`, {
         method: "PUT",
         headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({ sections }),
       });
       const data = await response.json();
       if (response.ok) {
-         return { success: true, data };
+        return { success: true, data };
       } else {
-         return { success: false, message: data.message };
+        return { success: false, message: data.message };
       }
     } catch (error) {
-       console.error("Error updating content:", error);
-       return { success: false, message: error.message };
+      console.error("Error updating content:", error);
+      return { success: false, message: error.message };
     }
   };
 
@@ -434,7 +434,7 @@ export const DataProvider = ({ children }) => {
     }
   };
 
-  const updateRepairStatus = async (id, newStatus) => {
+  const updateRepair = async (id, updates) => {
     try {
       const token = getToken();
       const response = await fetch(`${API_URL}/repairs/${id}/status`, {
@@ -443,7 +443,7 @@ export const DataProvider = ({ children }) => {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify({ status: newStatus }),
+        body: JSON.stringify(updates),
       });
 
       const data = await response.json();
@@ -454,8 +454,8 @@ export const DataProvider = ({ children }) => {
         return { success: true };
       }
     } catch (error) {
-       console.error("Error updating repair:", error);
-       return { success: false, message: error.message };
+      console.error("Error updating repair:", error);
+      return { success: false, message: error.message };
     }
   };
 
@@ -479,10 +479,40 @@ export const DataProvider = ({ children }) => {
     }
   };
 
+  // Stats Management
+  const [stats, setStats] = useState({
+    totalRevenue: 0,
+    successfulRepairs: 0,
+    totalUsers: 0,
+    totalVendors: 0,
+    clientCount: 0,
+    vendorCount: 0,
+    adminCount: 0,
+    monthlyData: []
+  });
+
+  const fetchStats = useCallback(async () => {
+    try {
+      const token = getToken();
+      if (!token) return;
+      const response = await fetch(`${API_URL}/repairs/stats`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      const data = await response.json();
+      if (response.ok) {
+        setStats(data);
+      }
+    } catch (error) {
+      console.error("Error fetching stats:", error);
+    }
+  }, []);
+
   // Brands Management
   const [brands, setBrands] = useState([]);
   const [brandMeta, setBrandMeta] = useState({ page: 1, pages: 1, total: 0 });
-  
+
   const fetchBrands = useCallback(async (params = {}) => {
     const { page = 1, limit = 5, search = "" } = params;
     try {
@@ -515,7 +545,7 @@ export const DataProvider = ({ children }) => {
         setBrands([...brands, data]);
         return { success: true };
       } else {
-         return { success: false, message: data.message };
+        return { success: false, message: data.message };
       }
     } catch (error) {
       console.error("Error adding brand:", error);
@@ -572,7 +602,7 @@ export const DataProvider = ({ children }) => {
         loadingRepairs,
         fetchRepairs,
         addRepair,
-        updateRepairStatus,
+        updateRepair,
         deleteRepair,
         brands,
         brandMeta,
@@ -586,6 +616,8 @@ export const DataProvider = ({ children }) => {
         deleteContactMessage,
         fetchContent,
         updateContent2: updateContent,
+        stats,
+        fetchStats,
       }}
     >
       {children}

@@ -53,6 +53,7 @@ const ClientDashboard = () => {
     issue: "",
     address: "",
     vendorId: "",
+    price: 0,
     image: null,
   });
 
@@ -73,6 +74,7 @@ const ClientDashboard = () => {
       status: "Pending",
       date: new Date().toISOString().split("T")[0],
       vendorId: bookingData.vendorId || null, 
+      price: Number(bookingData.price) || 0,
       history: ["Pending"],
     };
     addRepair(newReq);
@@ -83,6 +85,8 @@ const ClientDashboard = () => {
       model: "",
       issue: "",
       address: "",
+      vendorId: "",
+      price: 0,
       image: null,
     });
   };
@@ -413,6 +417,24 @@ const ClientDashboard = () => {
 
                   <div className="space-y-2">
                     <label className="text-xs font-black text-gray-400 uppercase tracking-widest ml-1">
+                      Budget / Estimated Price (PKR)
+                    </label>
+                    <input
+                      type="number"
+                      placeholder="0"
+                      className="w-full px-5 py-4 bg-gray-50 border-2 border-transparent rounded-2xl outline-none focus:bg-white focus:border-lime-500 focus:shadow-xl focus:shadow-lime-500/10 transition-all font-bold text-navy-900"
+                      value={bookingData.price}
+                      onChange={(e) =>
+                        setBookingData({
+                          ...bookingData,
+                          price: e.target.value,
+                        })
+                      }
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <label className="text-xs font-black text-gray-400 uppercase tracking-widest ml-1">
                       Photo (Optional)
                     </label>
                     <div className="border-2 border-dashed border-gray-200 rounded-3xl p-8 text-center bg-gray-50 group cursor-pointer hover:border-lime-500 hover:bg-lime-50/10 transition-all duration-300">
@@ -518,25 +540,50 @@ const ClientDashboard = () => {
           columns={[
             {
               header: "Device",
-              render: (req) => (
-                <div className="flex items-center gap-4">
-                  <div className={`w-12 h-12 rounded-xl flex items-center justify-center shadow-lg ${
-                    req.device === "Mobile" ? "bg-navy-900 text-lime-400" : "bg-lime-500 text-navy-900"
-                  }`}>
-                    {req.device === "Mobile" ? <Smartphone className="w-6 h-6" /> : <Laptop className="w-6 h-6" />}
+              render: (req) => {
+                const deviceStyles = {
+                  Mobile: "bg-rose-50 text-rose-600 border-rose-100",
+                  Laptop: "bg-blue-50 text-blue-600 border-blue-100",
+                  Desktop: "bg-indigo-50 text-indigo-600 border-indigo-100",
+                };
+                const style = deviceStyles[req.device] || "bg-gray-50 text-gray-600 border-gray-100";
+                
+                return (
+                  <div className="flex items-center gap-4">
+                    <div className={`w-12 h-12 rounded-xl flex items-center justify-center shadow-lg border-2 ${style}`}>
+                      {req.device === "Mobile" ? (
+                        <Smartphone className="w-6 h-6" />
+                      ) : req.device === "Laptop" ? (
+                        <Laptop className="w-6 h-6" />
+                      ) : (
+                        <Monitor className="w-6 h-6" />
+                      )}
+                    </div>
+                    <div>
+                      <div className="font-bold text-navy-900">
+                        {req.brand} {req.model}
+                      </div>
+                      <div className="text-xs text-gray-400 font-medium tracking-wide">
+                        #{req.id}
+                      </div>
+                    </div>
                   </div>
-                  <div>
-                    <div className="font-bold text-navy-900">{req.brand} {req.model}</div>
-                    <div className="text-xs text-gray-400 font-medium tracking-wide">#{req.id}</div>
-                  </div>
-                </div>
-              )
+                );
+              },
             },
             {
               header: "Issue",
               render: (req) => (
                 <div className="max-w-[200px] truncate font-medium text-gray-600" title={req.issue}>
                   {req.issue}
+                </div>
+              )
+            },
+            {
+              header: "Price",
+              render: (req) => (
+                <div className="font-black text-navy-900">
+                  {req.price || 0} PKR
                 </div>
               )
             },

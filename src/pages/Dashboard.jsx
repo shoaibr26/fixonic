@@ -89,10 +89,7 @@ const Dashboard = () => {
       <div className="flex flex-col md:flex-row md:items-end justify-between mb-10 gap-4 border-b border-gray-100 pb-4">
         <div>
           <h2 className="text-3xl font-black text-gray-900 tracking-tight mt-3">
-            Hello,{" "}
-            <span className="bg-clip-text text-transparent bg-gradient-to-r from-navy-900 to-navy-600">
-              {user?.name}
-            </span>
+            Welcome Back, {user?.name}
           </h2>
           <p className="text-gray-500 font-medium">
             Have a productive day at Fixonic.

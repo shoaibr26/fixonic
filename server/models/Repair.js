@@ -13,6 +13,7 @@ const repairSchema = mongoose.Schema({
     date: { type: String },
     vendorId: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
     history: [{ type: String }],
+    price: { type: Number, default: 0 },
     image: { type: String }
 }, { timestamps: true });
 

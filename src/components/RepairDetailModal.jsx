@@ -1,4 +1,4 @@
-import { X, ArrowRight, Smartphone, Laptop } from "lucide-react";
+import { X, ArrowRight, Smartphone, Laptop, Monitor } from "lucide-react";
 import Modal from "./Modal";
 
 const RepairDetailModal = ({ repair, onClose }) => {
@@ -48,19 +48,24 @@ const RepairDetailModal = ({ repair, onClose }) => {
         </div>
 
         <div className="p-10 space-y-8">
-          <div className="grid grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <div className="p-6 rounded-3xl bg-gray-50 border border-gray-100">
               <div className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-3">
                 Device Info
               </div>
               <div className="flex items-center gap-4">
                 <div
-                  className={`p-4 rounded-2xl ${repair.device === "Mobile" ? "bg-navy-900 text-white" : "bg-lime-500 text-navy-900"}`}
+                  className={`p-4 rounded-2xl border-2 ${repair.device === "Mobile" ? "bg-rose-50 text-rose-600 border-rose-100" :
+                      repair.device === "Laptop" ? "bg-blue-50 text-blue-600 border-blue-100" :
+                        "bg-indigo-50 text-indigo-600 border-indigo-100"
+                    }`}
                 >
                   {repair.device === "Mobile" ? (
                     <Smartphone className="w-6 h-6" />
-                  ) : (
+                  ) : repair.device === "Laptop" ? (
                     <Laptop className="w-6 h-6" />
+                  ) : (
+                    <Monitor className="w-6 h-6" />
                   )}
                 </div>
                 <div className="min-w-0">
@@ -85,6 +90,29 @@ const RepairDetailModal = ({ repair, onClose }) => {
               >
                 {repair.status}
               </div>
+            </div>
+            <div className="p-6 rounded-3xl bg-gray-50 border border-gray-100">
+              <div className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-3">
+                Service Price
+              </div>
+              <div className="text-2xl font-black text-navy-900 mb-1">
+                {repair.price || 0} PKR
+              </div>
+              <div className="text-[10px] text-gray-400 font-bold uppercase tracking-wider">
+                Total Estimate
+              </div>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="p-6 rounded-3xl bg-gray-50 border border-gray-100">
+              <div className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2">Customer Details</div>
+              <div className="font-bold text-navy-900">{repair.customerId?.name || repair.customer || 'N/A'}</div>
+              <div className="text-xs text-gray-500 mt-1">{repair.address}</div>
+            </div>
+            <div className="p-6 rounded-3xl bg-gray-50 border border-gray-100">
+              <div className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2">Assigned Vendor</div>
+              <div className="font-bold text-navy-900">{repair.vendorId?.name || 'Not Assigned Yet'}</div>
             </div>
           </div>
 
@@ -118,11 +146,10 @@ const RepairDetailModal = ({ repair, onClose }) => {
                       className="flex flex-col items-center relative z-10"
                     >
                       <div
-                        className={`w-8 h-8 rounded-full flex items-center justify-center text-[10px] font-black border-4 transition-all ${
-                          isCompleted
+                        className={`w-8 h-8 rounded-full flex items-center justify-center text-[10px] font-black border-4 transition-all ${isCompleted
                             ? "bg-lime-500 border-lime-500 text-navy-900"
                             : "bg-white border-gray-200 text-gray-300"
-                        }`}
+                          }`}
                       >
                         {i + 1}
                       </div>

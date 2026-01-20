@@ -15,12 +15,15 @@ import {
 const NavLinks = ({ setIsMobileMenuOpen, user }) => {
   const location = useLocation();
 
-  const getLinkClasses = (path) => {
+  const getLinkClasses = (path, showBorder = true) => {
     const isActive = location.pathname === path;
-    return `text-sm font-bold transition-colors border-b-2 ${
+    const borderClasses = showBorder 
+      ? `border-b-2 pb-1 ${isActive ? "border-lime-500" : "border-transparent"}`
+      : "";
+    return `text-sm font-bold transition-colors ${borderClasses} ${
       isActive
-        ? "text-white border-lime-500"
-        : "text-white/70 hover:text-white border-transparent"
+        ? "text-white"
+        : "text-white/70 hover:text-white"
     }`;
   };
 
@@ -65,7 +68,7 @@ const NavLinks = ({ setIsMobileMenuOpen, user }) => {
         <Link
           to="/dashboard"
           onClick={() => setIsMobileMenuOpen(false)}
-          className={getLinkClasses("/dashboard").replace(
+          className={getLinkClasses("/dashboard", false).replace(
             "text-white/70",
             "text-lime-500"
           ) + " flex items-center gap-2"}
@@ -77,7 +80,7 @@ const NavLinks = ({ setIsMobileMenuOpen, user }) => {
         <Link
           to="/dashboard"
           onClick={() => setIsMobileMenuOpen(false)}
-          className={getLinkClasses("/dashboard") + " flex items-center gap-2"}
+          className={getLinkClasses("/dashboard", false) + " flex items-center gap-2"}
         >
           <LayoutDashboard className="w-4 h-4 text-lime-500" /> Dashboard
         </Link>
@@ -86,7 +89,7 @@ const NavLinks = ({ setIsMobileMenuOpen, user }) => {
         <Link
           to="/dashboard"
           onClick={() => setIsMobileMenuOpen(false)}
-          className={getLinkClasses("/dashboard") + " flex items-center gap-2"}
+          className={getLinkClasses("/dashboard", false) + " flex items-center gap-2"}
         >
           <BarChart className="w-4 h-4 text-lime-500" /> Admin
         </Link>
@@ -140,8 +143,8 @@ const Navbar = () => {
           </div>
 
           {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center gap-8">
-            <div className="flex items-center space-x-8 mr-4 border-r pr-8 border-white/10">
+          <div className="hidden md:flex items-center gap-6">
+            <div className="flex items-center space-x-8 border-r pr-8 border-white/10">
               <NavLinks setIsMobileMenuOpen={setIsMobileMenuOpen} user={user} />
             </div>
 
