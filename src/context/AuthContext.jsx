@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { AuthContext } from "./AuthContextHooks";
+import { useToast } from "./ToastContext";
 export { useAuth } from "./AuthContextHooks";
 
 export const AuthProvider = ({ children }) => {
@@ -13,6 +14,7 @@ export const AuthProvider = ({ children }) => {
     }
   });
   const [loading] = useState(false);
+  const { showToast } = useToast();
 
   // API URL
   const API_URL = `${import.meta.env.VITE_API_BASE_URL}/auth`;
@@ -32,15 +34,20 @@ export const AuthProvider = ({ children }) => {
       if (response.ok) {
         setUser(data);
         localStorage.setItem("user", JSON.stringify(data));
+        showToast(`Welcome back, ${data.name || 'User'}!`, 'success');
         return { success: true };
       } else {
-        return { success: false, message: data.message || "Login failed" };
+        const errorMessage = data.message || "Login failed";
+        showToast(errorMessage, 'error');
+        return { success: false, message: errorMessage };
       }
     } catch (error) {
       console.error("Login error:", error);
+      const errorMessage = error.message || "Server error. Please try again later.";
+      showToast(errorMessage, 'error');
       return {
         success: false,
-        message: error.message || "Server error. Please try again later.",
+        message: errorMessage,
       };
     }
   };
@@ -60,18 +67,23 @@ export const AuthProvider = ({ children }) => {
       if (response.ok) {
         setUser(data);
         localStorage.setItem("user", JSON.stringify(data));
+        showToast('Account created successfully!', 'success');
         return { success: true };
       } else {
+        const errorMessage = data.message || "Registration failed";
+        showToast(errorMessage, 'error');
         return {
           success: false,
-          message: data.message || "Registration failed",
+          message: errorMessage,
         };
       }
     } catch (error) {
       console.error("Login error:", error);
+      const errorMessage = error.message || "Server error. Please try again later.";
+      showToast(errorMessage, 'error');
       return {
         success: false,
-        message: error.message || "Server error. Please try again later.",
+        message: errorMessage,
       };
     }
   };
@@ -79,6 +91,7 @@ export const AuthProvider = ({ children }) => {
   const logout = () => {
     setUser(null);
     localStorage.removeItem("user");
+    showToast('Logged out successfully', 'info');
   };
 
   const updateProfile = async (userData) => {

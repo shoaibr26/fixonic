@@ -14,10 +14,28 @@ const ContentManager = () => {
         // Landing Page Defaults
         'landing-hero-title': 'Fix Your Tech At Speed of Life.',
         'landing-hero-subtitle': 'Connect with top-rated technicians for instant repairs.',
-        'landing-services-title': 'We Fix Everything',
+        'landing-hero-primary-btn': 'Book Repair',
+        'landing-hero-secondary-btn': 'Vendor Portal',
         'landing-services-tag': 'Services',
-        'landing-reviews-title': 'Loved by Thousands',
+        'landing-services-title': 'We Fix Everything',
+        'landing-services-subtitle': 'From vintage consoles to the latest flagships, our experts handle it all.',
+        'landing-stats-1-num': '50k+',
+        'landing-stats-1-label': 'Repairs Done',
+        'landing-stats-2-num': '98%',
+        'landing-stats-2-label': 'Success Rate',
+        'landing-stats-3-num': '24h',
+        'landing-stats-3-label': 'Avg. Turnaround',
+        'landing-stats-4-num': '4.9',
+        'landing-stats-4-label': 'Customer Rating',
+        'landing-blogs-tag': 'Resources',
+        'landing-blogs-title': 'Tech Insights',
+        'landing-blogs-btn': 'View Journal',
         'landing-reviews-tag': 'Testimonials',
+        'landing-reviews-title': 'Loved by Thousands',
+        'landing-cta-title': 'Ready to fix your device?',
+        'landing-cta-subtitle': 'Join thousands of satisfied customers who trust Fixonic for their tech repairs.',
+        'landing-cta-primary-btn': 'Get Started Today',
+        'landing-cta-secondary-btn': 'Contact Support',
         // Journals Page
         'journals-hero-title': 'Tech Insights & Repair Guides',
         'journals-hero-subtitle': 'Stay updated with the latest tips, tricks, and news from the world of technology repair.',
@@ -41,7 +59,18 @@ const ContentManager = () => {
         // Services Page
         'services-hero-title': 'Our Expertise',
         'services-hero-subtitle': 'Professional repair services for all major brands and devices.',
-        'services-list-title': 'What We Fix',
+        'services-grid-title': 'Devices We Excel At',
+        'services-grid-subtitle': 'From smartphones to wearables, our technicians are equipped with state-of-the-art tools for every device.',
+        'services-process-title': 'How it works?',
+        'services-cta-title': "Don't see your device?",
+        'services-cta-subtitle': "Fear not! Our technicians are versatile masters of repair. Contact us and we'll see if we can help bring your device back to life.",
+        // Service Visibility
+        'services-show-smartphone': 'true',
+        'services-show-laptop': 'true',
+        'services-show-tablet': 'true',
+        'services-show-watch': 'true',
+        'services-show-speaker': 'true',
+        'services-show-monitor': 'true',
         // Contact Page
         'contact-hero-title': 'Get In Touch',
         'contact-hero-subtitle': 'We are here to help. Reach out to us for any queries or support.',
@@ -189,18 +218,19 @@ const ContentManager = () => {
                 <div className="p-8 space-y-8">
                     {activeTab === 'landing' && (
                         <>
-                            <h3 className="text-lg font-black text-navy-900 border-b pb-2 mb-6">Hero Section</h3>
-                            <div className="grid grid-cols-1 gap-6">
-                                <div>
+                            <h3 className="text-lg font-black text-navy-900 border-b pb-2 mb-6 mt-10">Hero & Stats Section</h3>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div className="md:col-span-2">
                                     <label className="block text-xs font-black text-gray-400 uppercase tracking-widest mb-2 ml-1">Hero Title</label>
                                     <input
                                         name="landing-hero-title"
                                         value={content['landing-hero-title']}
                                         onChange={handleChange}
-                                        className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-navy-500 focus:border-navy-500 transition-all"
+                                        className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-navy-500 focus:border-navy-500 transition-all font-mono text-sm"
                                     />
+                                    <p className="text-[10px] text-gray-400 mt-1 ml-1">Tip: Use \n for line breaks in the title.</p>
                                 </div>
-                                <div>
+                                <div className="md:col-span-2">
                                     <label className="block text-xs font-black text-gray-400 uppercase tracking-widest mb-2 ml-1">Hero Subtitle</label>
                                     <textarea
                                         name="landing-hero-subtitle"
@@ -209,9 +239,53 @@ const ContentManager = () => {
                                         className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-navy-500 focus:border-navy-500 transition-all h-24"
                                     />
                                 </div>
+                                <div>
+                                    <label className="block text-xs font-black text-gray-400 uppercase tracking-widest mb-2 ml-1">Primary Button Text</label>
+                                    <input
+                                        name="landing-hero-primary-btn"
+                                        value={content['landing-hero-primary-btn']}
+                                        onChange={handleChange}
+                                        className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-navy-500 focus:border-navy-500 transition-all"
+                                    />
+                                </div>
+                                <div>
+                                    <label className="block text-xs font-black text-gray-400 uppercase tracking-widest mb-2 ml-1">Secondary Button Text</label>
+                                    <input
+                                        name="landing-hero-secondary-btn"
+                                        value={content['landing-hero-secondary-btn']}
+                                        onChange={handleChange}
+                                        className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-navy-500 focus:border-navy-500 transition-all"
+                                    />
+                                </div>
+
+                                {/* Stats */}
+                                <div className="md:col-span-2 grid grid-cols-2 md:grid-cols-4 gap-4 mt-4">
+                                    {[1, 2, 3, 4].map(num => (
+                                        <div key={num} className="space-y-4 p-4 bg-gray-50 rounded-2xl border border-gray-100">
+                                            <div>
+                                                <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Stat {num} Value</label>
+                                                <input
+                                                    name={`landing-stats-${num}-num`}
+                                                    value={content[`landing-stats-${num}-num`]}
+                                                    onChange={handleChange}
+                                                    className="w-full px-3 py-2 bg-white border border-gray-200 rounded-lg text-sm font-black"
+                                                />
+                                            </div>
+                                            <div>
+                                                <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Stat {num} Label</label>
+                                                <input
+                                                    name={`landing-stats-${num}-label`}
+                                                    value={content[`landing-stats-${num}-label`]}
+                                                    onChange={handleChange}
+                                                    className="w-full px-3 py-2 bg-white border border-gray-200 rounded-lg text-xs font-bold"
+                                                />
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
                             </div>
 
-                            <h3 className="text-lg font-black text-navy-900 border-b pb-2 mb-6 mt-10">Sections</h3>
+                            <h3 className="text-lg font-black text-navy-900 border-b pb-2 mb-6 mt-10">Services & Insights Section</h3>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 <div>
                                     <label className="block text-xs font-black text-gray-400 uppercase tracking-widest mb-2 ml-1">Services Tagline</label>
@@ -231,6 +305,49 @@ const ContentManager = () => {
                                         className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-navy-500 focus:border-navy-500 transition-all"
                                     />
                                 </div>
+                                <div className="md:col-span-2">
+                                    <label className="block text-xs font-black text-gray-400 uppercase tracking-widest mb-2 ml-1">Services Subtitle</label>
+                                    <input
+                                        name="landing-services-subtitle"
+                                        value={content['landing-services-subtitle']}
+                                        onChange={handleChange}
+                                        className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-navy-500 focus:border-navy-500 transition-all"
+                                    />
+                                </div>
+
+                                <div className="md:col-span-2 h-px bg-gray-100 my-4"></div>
+
+                                <div>
+                                    <label className="block text-xs font-black text-gray-400 uppercase tracking-widest mb-2 ml-1">Blogs Tagline</label>
+                                    <input
+                                        name="landing-blogs-tag"
+                                        value={content['landing-blogs-tag']}
+                                        onChange={handleChange}
+                                        className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-navy-500 focus:border-navy-500 transition-all"
+                                    />
+                                </div>
+                                <div>
+                                    <label className="block text-xs font-black text-gray-400 uppercase tracking-widest mb-2 ml-1">Blogs Title</label>
+                                    <input
+                                        name="landing-blogs-title"
+                                        value={content['landing-blogs-title']}
+                                        onChange={handleChange}
+                                        className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-navy-500 focus:border-navy-500 transition-all"
+                                    />
+                                </div>
+                                <div>
+                                    <label className="block text-xs font-black text-gray-400 uppercase tracking-widest mb-2 ml-1">Blogs Button Text</label>
+                                    <input
+                                        name="landing-blogs-btn"
+                                        value={content['landing-blogs-btn']}
+                                        onChange={handleChange}
+                                        className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-navy-500 focus:border-navy-500 transition-all"
+                                    />
+                                </div>
+                            </div>
+
+                            <h3 className="text-lg font-black text-navy-900 border-b pb-2 mb-6 mt-10">Testimonials & CTA Section</h3>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 <div>
                                     <label className="block text-xs font-black text-gray-400 uppercase tracking-widest mb-2 ml-1">Testimonials Tagline</label>
                                     <input
@@ -245,6 +362,45 @@ const ContentManager = () => {
                                     <input
                                         name="landing-reviews-title"
                                         value={content['landing-reviews-title']}
+                                        onChange={handleChange}
+                                        className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-navy-500 focus:border-navy-500 transition-all"
+                                    />
+                                </div>
+
+                                <div className="md:col-span-2 h-px bg-gray-100 my-4"></div>
+
+                                <div className="md:col-span-2">
+                                    <label className="block text-xs font-black text-gray-400 uppercase tracking-widest mb-2 ml-1">CTA Title</label>
+                                    <input
+                                        name="landing-cta-title"
+                                        value={content['landing-cta-title']}
+                                        onChange={handleChange}
+                                        className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-navy-500 focus:border-navy-500 transition-all"
+                                    />
+                                </div>
+                                <div className="md:col-span-2">
+                                    <label className="block text-xs font-black text-gray-400 uppercase tracking-widest mb-2 ml-1">CTA Subtitle</label>
+                                    <textarea
+                                        name="landing-cta-subtitle"
+                                        value={content['landing-cta-subtitle']}
+                                        onChange={handleChange}
+                                        className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-navy-500 focus:border-navy-500 transition-all h-24"
+                                    />
+                                </div>
+                                <div>
+                                    <label className="block text-xs font-black text-gray-400 uppercase tracking-widest mb-2 ml-1">CTA Primary Button</label>
+                                    <input
+                                        name="landing-cta-primary-btn"
+                                        value={content['landing-cta-primary-btn']}
+                                        onChange={handleChange}
+                                        className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-navy-500 focus:border-navy-500 transition-all"
+                                    />
+                                </div>
+                                <div>
+                                    <label className="block text-xs font-black text-gray-400 uppercase tracking-widest mb-2 ml-1">CTA Secondary Button</label>
+                                    <input
+                                        name="landing-cta-secondary-btn"
+                                        value={content['landing-cta-secondary-btn']}
                                         onChange={handleChange}
                                         className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-navy-500 focus:border-navy-500 transition-all"
                                     />
@@ -424,17 +580,86 @@ const ContentManager = () => {
                                 </div>
                             </div>
 
-                            <h3 className="text-lg font-black text-navy-900 border-b pb-2 mb-6 mt-10">Services List</h3>
+                            <h3 className="text-lg font-black text-navy-900 border-b pb-2 mb-6 mt-10">Services Grid Section</h3>
                             <div className="grid grid-cols-1 gap-6">
                                 <div>
-                                    <label className="block text-xs font-black text-gray-400 uppercase tracking-widest mb-2 ml-1">List Title</label>
+                                    <label className="block text-xs font-black text-gray-400 uppercase tracking-widest mb-2 ml-1">Grid Title</label>
                                     <input
-                                        name="services-list-title"
-                                        value={content['services-list-title']}
+                                        name="services-grid-title"
+                                        value={content['services-grid-title']}
                                         onChange={handleChange}
                                         className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-navy-500 focus:border-navy-500 transition-all"
                                     />
                                 </div>
+                                <div>
+                                    <label className="block text-xs font-black text-gray-400 uppercase tracking-widest mb-2 ml-1">Grid Subtitle</label>
+                                    <textarea
+                                        name="services-grid-subtitle"
+                                        value={content['services-grid-subtitle']}
+                                        onChange={handleChange}
+                                        className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-navy-500 focus:border-navy-500 transition-all h-24"
+                                    />
+                                </div>
+                            </div>
+
+                            <h3 className="text-lg font-black text-navy-900 border-b pb-2 mb-6 mt-10">Process Section</h3>
+                            <div className="grid grid-cols-1 gap-6">
+                                <div>
+                                    <label className="block text-xs font-black text-gray-400 uppercase tracking-widest mb-2 ml-1">Process Title</label>
+                                    <input
+                                        name="services-process-title"
+                                        value={content['services-process-title']}
+                                        onChange={handleChange}
+                                        className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-navy-500 focus:border-navy-500 transition-all"
+                                    />
+                                </div>
+                            </div>
+
+                            <h3 className="text-lg font-black text-navy-900 border-b pb-2 mb-6 mt-10">CTA Section</h3>
+                            <div className="grid grid-cols-1 gap-6">
+                                <div>
+                                    <label className="block text-xs font-black text-gray-400 uppercase tracking-widest mb-2 ml-1">CTA Title</label>
+                                    <input
+                                        name="services-cta-title"
+                                        value={content['services-cta-title']}
+                                        onChange={handleChange}
+                                        className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-navy-500 focus:border-navy-500 transition-all"
+                                    />
+                                </div>
+                                <div>
+                                    <label className="block text-xs font-black text-gray-400 uppercase tracking-widest mb-2 ml-1">CTA Subtitle</label>
+                                    <textarea
+                                        name="services-cta-subtitle"
+                                        value={content['services-cta-subtitle']}
+                                        onChange={handleChange}
+                                        className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-navy-500 focus:border-navy-500 transition-all h-24"
+                                    />
+                                </div>
+                            </div>
+
+                            <h3 className="text-lg font-black text-navy-900 border-b pb-2 mb-6 mt-10">Manage Service Visibility</h3>
+                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                                {[
+                                    { id: 'services-show-smartphone', label: 'Mobile Repair' },
+                                    { id: 'services-show-laptop', label: 'Laptop Repair' },
+                                    { id: 'services-show-tablet', label: 'Tablet Repair' },
+                                    { id: 'services-show-watch', label: 'Smartwatch Repair' },
+                                    { id: 'services-show-speaker', label: 'Home Audio Repair' },
+                                    { id: 'services-show-monitor', label: 'Desktop/Monitor Repair' },
+                                ].map((item) => (
+                                    <div key={item.id} className="flex items-center justify-between p-4 bg-gray-50 rounded-2xl border border-gray-100">
+                                        <label className="text-sm font-bold text-navy-900">{item.label}</label>
+                                        <label className="relative inline-flex items-center cursor-pointer">
+                                            <input
+                                                type="checkbox"
+                                                className="sr-only peer"
+                                                checked={content[item.id] === 'true'}
+                                                onChange={(e) => setContent(prev => ({ ...prev, [item.id]: e.target.checked ? 'true' : 'false' }))}
+                                            />
+                                            <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-lime-500"></div>
+                                        </label>
+                                    </div>
+                                ))}
                             </div>
                         </>
                     )}

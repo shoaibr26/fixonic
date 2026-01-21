@@ -9,6 +9,17 @@ const Services = () => {
   const [content, setContent] = useState({
     'services-hero-title': 'Our Professional',
     'services-hero-subtitle': 'Choose from a wide range of specialized repair categories. Our experts handle everything with precision.',
+    'services-grid-title': 'Devices We Excel At',
+    'services-grid-subtitle': 'From smartphones to wearables, our technicians are equipped with state-of-the-art tools for every device.',
+    'services-process-title': 'How it works?',
+    'services-cta-title': "Don't see your device?",
+    'services-cta-subtitle': "Fear not! Our technicians are versatile masters of repair. Contact us and we'll see if we can help bring your device back to life.",
+    'services-show-smartphone': 'true',
+    'services-show-laptop': 'true',
+    'services-show-tablet': 'true',
+    'services-show-watch': 'true',
+    'services-show-speaker': 'true',
+    'services-show-monitor': 'true',
   });
 
   useEffect(() => {
@@ -65,8 +76,8 @@ const Services = () => {
         <div className="max-w-7xl mx-auto">
           <div className="flex flex-col md:flex-row items-end justify-between mb-16 gap-6">
             <div className="max-w-xl">
-              <h2 className="text-4xl font-black text-navy-900 mb-4 tracking-tight">Devices We Excel At</h2>
-              <p className="text-gray-500 font-medium">From smartphones to wearables, our technicians are equipped with state-of-the-art tools for every device.</p>
+              <h2 className="text-4xl font-black text-navy-900 mb-4 tracking-tight">{content['services-grid-title']}</h2>
+              <p className="text-gray-500 font-medium">{content['services-grid-subtitle']}</p>
             </div>
             <div className="flex items-center gap-4 text-sm font-bold text-navy-400 uppercase tracking-widest bg-white px-6 py-3 rounded-2xl border border-gray-100">
               <span className="flex items-center gap-2"><Clock className="w-4 h-4" /> Fast Turnaround</span>
@@ -76,7 +87,7 @@ const Services = () => {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {SERVICE_CATEGORIES.map((service, i) => (
+            {SERVICE_CATEGORIES.filter(s => content[`services-show-${s.iconKey}`] !== 'false').map((service, i) => (
               <div key={i} className="group relative bg-white rounded-[2.5rem] p-10 border border-gray-100 shadow-xl shadow-gray-200/50 hover:shadow-2xl hover:shadow-navy-900/10 transition-all duration-500 hover:-translate-y-2 flex flex-col">
                 <div className={`w-20 h-20 rounded-2xl flex items-center justify-center mb-8 ${service.color} group-hover:rotate-6 transition-all duration-500 shadow-lg shadow-inherit/20`}>
                   {icons[service.iconKey]}
@@ -112,7 +123,7 @@ const Services = () => {
         <div className="max-w-7xl mx-auto px-4">
           <div className="text-center mb-16">
             <span className="text-lime-600 font-black text-xs uppercase tracking-widest">Our Method</span>
-            <h2 className="text-4xl font-black text-navy-900 mt-2 tracking-tight">How it works?</h2>
+            <h2 className="text-4xl font-black text-navy-900 mt-2 tracking-tight">{content['services-process-title']}</h2>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-12 relative">
             {/* Horizontal Line for Tablet/Desktop */}
@@ -143,9 +154,9 @@ const Services = () => {
             <div className="absolute bottom-0 left-0 w-96 h-96 bg-navy-400/10 rounded-full blur-[100px] -ml-48 -mb-48"></div>
 
             <div className="relative z-10">
-              <h2 className="text-4xl md:text-5xl font-black mb-6 tracking-tight">Don't see your device?</h2>
+              <h2 className="text-4xl md:text-5xl font-black mb-6 tracking-tight">{content['services-cta-title']}</h2>
               <p className="text-gray-400 mb-12 max-w-xl mx-auto text-lg font-medium leading-relaxed">
-                Fear not! Our technicians are versatile masters of repair. Contact us and we'll see if we can help bring your device back to life.
+                {content['services-cta-subtitle']}
               </p>
               <div className="flex flex-col sm:flex-row items-center justify-center gap-6">
                 <Link to="/contact" className="w-full sm:w-auto px-12 py-6 bg-lime-500 text-navy-900 font-black rounded-2xl shadow-2xl shadow-lime-500/30 hover:bg-lime-400 hover:scale-105 transition-all uppercase tracking-widest text-sm">
